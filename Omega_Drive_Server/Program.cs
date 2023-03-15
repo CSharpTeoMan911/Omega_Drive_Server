@@ -5,7 +5,6 @@ namespace Omega_Drive_Server
 {
     class Program:Server_Application_Variables
     {
-
         private sealed class Server_Cryptographic_Functions_Mitigator:Server_Cryptographic_Functions
         {
             internal static async Task<bool> Create_X509_Server_Certificate_Initiator(string password, int certificate_valid_time_period_in_days)
@@ -16,6 +15,11 @@ namespace Omega_Drive_Server
             internal static async Task<bool> Delete_X509_Server_Certificate_Initiator()
             {
                 return await Delete_X509_Server_Certificate();
+            }
+
+            internal static async Task<bool> Load_Server_Certificate_In_Application_Memory_Initiator(string password)
+            {
+                return await Load_Server_Certificate_In_Application_Memory(password);
             }
         }
 
@@ -30,6 +34,8 @@ namespace Omega_Drive_Server
 
         static void Main(string[] args)
         {
+            Server_Cryptographic_Functions_Mitigator.Load_Server_Certificate_In_Application_Memory_Initiator("OMEGA");
+
             server_functionality_timer = new System.Timers.Timer();
             server_functionality_timer.Elapsed += Server_functionality_timer_Elapsed;
             server_functionality_timer.Interval = 100;
@@ -44,7 +50,20 @@ namespace Omega_Drive_Server
 
             if (option == "Start")
             {
-                Server_Operation();
+                System.Threading.Thread client_connection_thread = new System.Threading.Thread(async () =>
+                {
+                    Server_Operation();
+                });
+
+                if (OperatingSystem.IsWindows() == true)
+                {
+#pragma warning disable CA1416 // Validate platform compatibility
+                    client_connection_thread.SetApartmentState(System.Threading.ApartmentState.MTA);
+#pragma warning restore CA1416 // Validate platform compatibility
+                }
+                client_connection_thread.Priority = System.Threading.ThreadPriority.Highest;
+                client_connection_thread.IsBackground = false;
+                client_connection_thread.Start();
 
                 goto Main_Menu;
             }
@@ -52,7 +71,10 @@ namespace Omega_Drive_Server
             {
                 if(server_socket != null)
                 {
-                    server_socket.Shutdown(System.Net.Sockets.SocketShutdown.Both);
+                    if(server_socket.Connected == true)
+                    {
+                        server_socket.Shutdown(System.Net.Sockets.SocketShutdown.Both);
+                    }
                     server_socket.Close();
                     server_socket.Dispose();
                 }
@@ -88,7 +110,10 @@ namespace Omega_Drive_Server
 
             if(server_socket != null)
             {
-                server_socket.Shutdown(System.Net.Sockets.SocketShutdown.Both);
+                if (server_socket.Connected == true)
+                {
+                    server_socket.Shutdown(System.Net.Sockets.SocketShutdown.Both);
+                }
                 server_socket.Close();
                 server_socket.Dispose();
             }
@@ -99,34 +124,25 @@ namespace Omega_Drive_Server
             
         }
 
-        private static void Server_Operation()
+        private static async void Server_Operation()
         {
             try
             {
                 server_socket = new System.Net.Sockets.Socket(System.Net.Sockets.AddressFamily.InterNetwork, System.Net.Sockets.SocketType.Stream, System.Net.Sockets.ProtocolType.Tcp);
                 server_socket.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, port_number));
-
+                server_socket.ReceiveTimeout = 1000;
+                server_socket.SendTimeout = 1000;
                 server_socket.Listen(number_of_clients_backlog);
 
                 while (server_opened == true)
                 {
-                    System.Threading.Thread client_connection_thread = new System.Threading.Thread(async () =>
-                    {
-                        await Client_Connections_Mitigator.Secure_Client_Connection_Initiator(server_socket.Accept());
-                    });
-
-                    if (OperatingSystem.IsWindows() == true)
-                    {
-#pragma warning disable CA1416 // Validate platform compatibility
-                        client_connection_thread.SetApartmentState(System.Threading.ApartmentState.MTA);
-#pragma warning restore CA1416 // Validate platform compatibility
-                    }
-                    client_connection_thread.Priority = System.Threading.ThreadPriority.Highest;
-                    client_connection_thread.IsBackground = false;
-                    client_connection_thread.Start();
+                    await Client_Connections_Mitigator.Secure_Client_Connection_Initiator(server_socket.Accept());
                 }
             }
-            catch { }
+            catch(Exception E) 
+            {
+                
+            }
         }
     }
 }

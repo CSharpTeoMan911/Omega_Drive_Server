@@ -21,9 +21,18 @@ namespace Omega_Drive_Server
                     try
                     {
                         client_secure_socket_layer_stream.AuthenticateAsServer(server_certificate, false, System.Security.Authentication.SslProtocols.Tls11, false);
+
+
+                        byte[] test_connection_send = Encoding.UTF8.GetBytes("OK");
+                        byte[] test_connection_receive = new byte[Encoding.UTF8.GetBytes("OK").Length];
+
+                        await client_secure_socket_layer_stream.WriteAsync(test_connection_send, 0, test_connection_send.Length);
+
+                        await client_secure_socket_layer_stream.ReadAsync(test_connection_receive, 0, test_connection_receive.Length);
                     }
-                    catch
+                    catch(Exception E)
                     {
+                        System.Diagnostics.Debug.WriteLine(E.Message);
                         if(client_secure_socket_layer_stream != null)
                         {
                             client_secure_socket_layer_stream.Close();
@@ -38,8 +47,9 @@ namespace Omega_Drive_Server
                         }
                     }
                 }
-                catch
+                catch (Exception E)
                 {
+                    System.Diagnostics.Debug.WriteLine(E.Message);
                     if (client_network_stream != null)
                     {
                         client_network_stream.Close();
@@ -54,9 +64,10 @@ namespace Omega_Drive_Server
                     }
                 }
             }
-            catch
+            catch (Exception E)
             {
-                if(client != null)
+                System.Diagnostics.Debug.WriteLine(E.Message);
+                if (client != null)
                 {
                     client.Close();
                 }

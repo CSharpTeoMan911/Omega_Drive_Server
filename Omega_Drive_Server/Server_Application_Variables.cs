@@ -13,7 +13,7 @@ namespace Omega_Drive_Server
 
         protected static bool server_opened;
         protected static int port_number = 1024;
-        protected static int number_of_clients_backlog = 100;
+        protected static int number_of_clients_backlog = 1000;
 
         protected static System.Security.Cryptography.X509Certificates.X509Certificate2 server_certificate;
     }
