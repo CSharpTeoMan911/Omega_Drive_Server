@@ -3,11 +3,12 @@ using System.Threading.Tasks;
 
 namespace Omega_Drive_Server
 {
-    class Server_Cryptographic_Functions
+    class Server_Cryptographic_Functions:Server_Application_Variables
     {
+        private static string server_certificate_name = "Omega_Drive.crt";
 
 
-        public static async Task<bool> Create_X509_Server_Certificate(string password, int certificate_valid_time_period_in_days)
+        protected static async Task<bool> Create_X509_Server_Certificate(string password, int certificate_valid_time_period_in_days)
         {
 
             bool server_certificate_creation_successful = false;
@@ -87,7 +88,7 @@ namespace Omega_Drive_Server
                     await certificate_memory_stream.FlushAsync();
 
 
-                    System.IO.FileStream certificate_file_stream = System.IO.File.Create("Omega_Drive.crt", (int)certificate_memory_stream.Length, System.IO.FileOptions.Asynchronous);
+                    System.IO.FileStream certificate_file_stream = System.IO.File.Create(server_certificate_name, (int)certificate_memory_stream.Length, System.IO.FileOptions.Asynchronous);
                     try
                     {
                         await certificate_file_stream.WriteAsync(certificate_memory_stream.ToArray());
@@ -138,6 +139,51 @@ namespace Omega_Drive_Server
 
 
             return server_certificate_creation_successful;
+        }
+
+
+        protected static Task<bool> Delete_X509_Server_Certificate()
+        {
+            bool server_certificate_deletion_result_successful = false;
+
+
+            try
+            {
+                if(System.IO.File.Exists(server_certificate_name) == true)
+                {
+                    System.IO.File.Delete(server_certificate_name);
+                }
+
+                server_certificate_deletion_result_successful = true;
+            }
+            catch{ }
+
+            return Task.FromResult(server_certificate_deletion_result_successful);
+        }
+
+
+        protected static Task<bool> Load_Server_Certificate_In_Application_Memory(string password)
+        {
+            bool server_certificate_load_successful = false;
+
+            if(System.IO.File.Exists(server_certificate_name) == true)
+            {
+                string file_path = String.Empty;
+
+                if (System.OperatingSystem.IsWindows() == true)
+                {
+                    file_path = Environment.CurrentDirectory + "\\" + server_certificate_name;
+                }
+                else
+                {
+                    file_path = Environment.CurrentDirectory + "/" + server_certificate_name;
+                }
+
+
+                server_certificate = new System.Security.Cryptography.X509Certificates.X509Certificate2(file_path, password);
+            }
+
+            return Task.FromResult(server_certificate_load_successful);
         }
     }
 }
