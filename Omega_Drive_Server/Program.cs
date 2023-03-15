@@ -6,7 +6,7 @@ namespace Omega_Drive_Server
     class Program:Server_Application_Variables
     {
 
-        protected sealed class Server_Cryptographic_Functions_Mitigator:Server_Cryptographic_Functions
+        private sealed class Server_Cryptographic_Functions_Mitigator:Server_Cryptographic_Functions
         {
             internal static async Task<bool> Create_X509_Server_Certificate_Initiator(string password, int certificate_valid_time_period_in_days)
             {
