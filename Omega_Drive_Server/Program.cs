@@ -34,7 +34,12 @@ namespace Omega_Drive_Server
 
         static void Main(string[] args)
         {
-            Server_Cryptographic_Functions_Mitigator.Load_Server_Certificate_In_Application_Memory_Initiator("OMEGA");
+            Server_Functionalities();
+        }
+
+        private static async void Server_Functionalities()
+        {
+            await Server_Cryptographic_Functions_Mitigator.Load_Server_Certificate_In_Application_Memory_Initiator("OMEGA");
 
             server_functionality_timer = new System.Timers.Timer();
             server_functionality_timer.Elapsed += Server_functionality_timer_Elapsed;
@@ -47,9 +52,7 @@ namespace Omega_Drive_Server
 
         Main_Menu:
             Server_Application_GUI.Main_Menu();
-            string input = String.Empty;
-
-            input = Console.ReadLine();
+            string input = await Input();
 
             if (input == "S")
             {
@@ -153,6 +156,11 @@ namespace Omega_Drive_Server
             {
                 
             }
+        }
+
+        private static Task<string> Input()
+        {
+            return Task.FromResult(Console.ReadLine());
         }
     }
 }
