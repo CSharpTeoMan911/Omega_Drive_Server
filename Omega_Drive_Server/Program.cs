@@ -46,46 +46,56 @@ namespace Omega_Drive_Server
 
 
         Main_Menu:
-            string option = Server_Application_GUI.Main_Menu();
+            Server_Application_GUI.Main_Menu();
+            string input = String.Empty;
 
-            if (option == "Start")
+            input = Console.ReadLine();
+
+            if (input == "S")
             {
-                System.Threading.Thread client_connection_thread = new System.Threading.Thread(async () =>
+                if (server_opened == false)
                 {
-                    Server_Operation();
-                });
+                    server_opened = true;
 
-                if (OperatingSystem.IsWindows() == true)
-                {
-#pragma warning disable CA1416 // Validate platform compatibility
-                    client_connection_thread.SetApartmentState(System.Threading.ApartmentState.MTA);
-#pragma warning restore CA1416 // Validate platform compatibility
-                }
-                client_connection_thread.Priority = System.Threading.ThreadPriority.Highest;
-                client_connection_thread.IsBackground = false;
-                client_connection_thread.Start();
-
-                goto Main_Menu;
-            }
-            else if (option == "Stop")
-            {
-                if(server_socket != null)
-                {
-                    if(server_socket.Connected == true)
+                    System.Threading.Thread client_connection_thread = new System.Threading.Thread(async () =>
                     {
-                        server_socket.Shutdown(System.Net.Sockets.SocketShutdown.Both);
-                    }
-                    server_socket.Close();
-                    server_socket.Dispose();
-                }
+                        Server_Operation();
+                    });
 
-                goto Main_Menu;
+                    if (OperatingSystem.IsWindows() == true)
+                    {
+                        #pragma warning disable CA1416 // Validate platform compatibility
+                        client_connection_thread.SetApartmentState(System.Threading.ApartmentState.MTA);
+                        #pragma warning restore CA1416 // Validate platform compatibility
+                    }
+                    client_connection_thread.Priority = System.Threading.ThreadPriority.Highest;
+                    client_connection_thread.IsBackground = false;
+                    client_connection_thread.Start();
+
+                    goto Main_Menu;
+                }
+                else
+                {
+                    server_opened = false;
+
+                    if (server_socket != null)
+                    {
+                        if (server_socket.Connected == true)
+                        {
+                            server_socket.Shutdown(System.Net.Sockets.SocketShutdown.Both);
+                        }
+                        server_socket.Close();
+                        server_socket.Dispose();
+                    }
+
+                    goto Main_Menu;
+                }
             }
-            else if (option == "O")
+            else if (input == "O")
             {
-            //Options_Menu:;
+                
             }
-            else if (option == "E")
+            else if (input == "E")
             {
                 Environment.Exit(0);
             }

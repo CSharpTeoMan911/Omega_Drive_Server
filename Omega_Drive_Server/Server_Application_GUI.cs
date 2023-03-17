@@ -8,9 +8,10 @@ namespace Omega_Drive_Server
 {
     class Server_Application_GUI:Server_Application_Variables
     {
-        public static string Main_Menu()
+        public static async void Main_Menu()
         {
-            Console.Clear();
+            await Clear_Screen();
+
             Console.ForegroundColor = ConsoleColor.Blue;
 
             Console.Write("\n\n\n\t\t" + @"    ////////////|" + "\n");
@@ -46,38 +47,20 @@ namespace Omega_Drive_Server
             Console.Write("\n\n\t\t\t                [ - ] Input: ");
 
             Console.ForegroundColor = ConsoleColor.White;
+        }
 
-            string input = Console.ReadLine();
-            string return_value = String.Empty;
-
-
-            if (input == "S")
+        private static Task<bool> Clear_Screen()
+        {
+            if(OperatingSystem.IsWindows() == true)
             {
-                if (server_opened == false)
-                {
-                    server_opened = true;
-                    return_value = "Start";
-                }
-                else
-                {
-                    server_opened = false;
-                    return_value = "Stop";
-                }
-            }
-            else if (input == "O")
-            {
-                return_value = input;
-            }
-            else if (input == "E")
-            {
-                return_value = input;
+                Console.Clear();
             }
             else
             {
-                Main_Menu();
+                Console.Clear();
             }
 
-            return return_value;
+            return Task.FromResult(true);
         }
     }
 }

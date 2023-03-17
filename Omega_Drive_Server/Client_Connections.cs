@@ -20,15 +20,7 @@ namespace Omega_Drive_Server
 
                     try
                     {
-                        client_secure_socket_layer_stream.AuthenticateAsServer(server_certificate, false, System.Security.Authentication.SslProtocols.Tls11, false);
-
-
-                        byte[] test_connection_send = Encoding.UTF8.GetBytes("OK");
-                        byte[] test_connection_receive = new byte[Encoding.UTF8.GetBytes("OK").Length];
-
-                        await client_secure_socket_layer_stream.WriteAsync(test_connection_send, 0, test_connection_send.Length);
-
-                        await client_secure_socket_layer_stream.ReadAsync(test_connection_receive, 0, test_connection_receive.Length);
+                        client_secure_socket_layer_stream.AuthenticateAsServer(server_certificate, false, System.Security.Authentication.SslProtocols.Tls12, false);
                     }
                     catch(Exception E)
                     {
