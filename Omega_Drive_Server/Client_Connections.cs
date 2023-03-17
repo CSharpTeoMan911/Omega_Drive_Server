@@ -10,7 +10,6 @@ namespace Omega_Drive_Server
     {
         protected static async Task<bool> Secure_Client_Connection(System.Net.Sockets.Socket client)
         {
-            //
             try
             {
                 System.Net.Sockets.NetworkStream client_network_stream = new System.Net.Sockets.NetworkStream(client);
