@@ -10,7 +10,7 @@ namespace Omega_Drive_Server
     {
         public static async void Main_Menu()
         {
-            await Clear_Screen();
+            Console.Clear();
 
             Console.ForegroundColor = ConsoleColor.Blue;
 
@@ -49,18 +49,6 @@ namespace Omega_Drive_Server
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        private static Task<bool> Clear_Screen()
-        {
-            if(OperatingSystem.IsWindows() == true)
-            {
-                Console.Clear();
-            }
-            else
-            {
-                Console.Clear();
-            }
-
-            return Task.FromResult(true);
-        }
+        
     }
 }
