@@ -1,5 +1,12 @@
 ﻿using System;
+using System.Collections;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
+using Cloudmersive.APIClient.NETCore.VirusScan.Api;
+using Cloudmersive.APIClient.NETCore.VirusScan.Client;
+using Cloudmersive.APIClient.NETCore.VirusScan.Model;
 
 namespace Omega_Drive_Server
 {
@@ -184,6 +191,30 @@ namespace Omega_Drive_Server
             }
 
             return Task.FromResult(server_certificate_load_successful);
+        }
+
+
+        protected static async Task<string> Scan_File_With_Cloudmersive(byte[] file)
+        {
+            string virus_scan_result = String.Empty;
+
+            try
+            {
+                Configuration.Default.ApiKey.Add("Apikey", Cloudmersive_Api_Key);
+
+                var Cloudmersive_Api = new ScanApi();
+                
+                Stream s = new MemoryStream(file);
+
+                VirusScanResult Virus_Scan_Result = await Cloudmersive_Api.ScanFileAsync(s);
+                Debug.WriteLine(Virus_Scan_Result);
+            }
+            catch(Exception E)
+            {
+                virus_scan_result = E.Message;
+            }
+            
+            return virus_scan_result;
         }
     }
 }

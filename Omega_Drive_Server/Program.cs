@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Omega_Drive_Server
@@ -21,6 +22,11 @@ namespace Omega_Drive_Server
             {
                 return await Load_Server_Certificate_In_Application_Memory(password);
             }
+
+            internal static async Task<string> Scan_File_With_Cloudmersive_Initiator(byte[] file)
+            {
+                return await Scan_File_With_Cloudmersive(file);
+            }
         }
 
         private sealed class Client_Connections_Mitigator:Client_Connections
@@ -34,12 +40,19 @@ namespace Omega_Drive_Server
 
         static void Main(string[] args)
         {
-            Server_Functionalities();
+            // Force the [ Main ] thread to wait after the [ Task<bool> Application_Main_Thread ] thread
+            // in order for the application not to finish its execution prematurely, by making the
+            // [ Main ] thread to wait for a return value that the Task<bool> Application_Main_Thread ]
+            // must give at the end of its execution, which is set to happen when the program is
+            // scheduled for exit.
+            bool return_value = Application_Main_Thread().Result;
         }
 
-        private static async void Server_Functionalities()
-        {
-            await Server_Cryptographic_Functions_Mitigator.Load_Server_Certificate_In_Application_Memory_Initiator("OMEGA");
+
+        private static async Task<bool> Application_Main_Thread()
+        { 
+            await Load_Server_Application_Settings_File();
+
 
             server_functionality_timer = new System.Timers.Timer();
             server_functionality_timer.Elapsed += Server_functionality_timer_Elapsed;
@@ -49,10 +62,9 @@ namespace Omega_Drive_Server
             System.AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 
 
-
         Main_Menu:
             Server_Application_GUI.Main_Menu();
-            string input = await Input();
+            string input = Console.ReadLine();
 
             if (input == "S")
             {
@@ -94,9 +106,50 @@ namespace Omega_Drive_Server
                     goto Main_Menu;
                 }
             }
-            else if (input == "O")
+            else if (input == "ST")
             {
-                
+
+            Settings_Menu:
+
+                Server_Application_GUI.Settings_Menu();
+
+                string settings_input = Console.ReadLine();
+
+                if (settings_input == "S")
+                {
+                    SMTPS_Settings();
+                    goto Settings_Menu;
+                }
+                else if (settings_input == "EV")
+                {
+                    Cloudmersive_Scan_Enabled();
+                    goto Settings_Menu;
+                }
+                else if (settings_input == "DV")
+                {
+                    Cloudmersive_Scan_Disabled();
+                    goto Settings_Menu;
+                }
+                else if (settings_input == "SV")
+                {
+                    goto Settings_Menu;
+                }
+                else if (settings_input == "SM")
+                {
+                    goto Settings_Menu;
+                }
+                else if (settings_input == "G")
+                {
+                    goto Settings_Menu;
+                }
+                else if (settings_input == "EX")
+                {
+                    goto Main_Menu;
+                }
+                else
+                {
+                    goto Settings_Menu;
+                }
             }
             else if (input == "E")
             {
@@ -106,6 +159,9 @@ namespace Omega_Drive_Server
             {
                 goto Main_Menu;
             }
+
+
+            return true;
         }
 
         private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
@@ -158,9 +214,106 @@ namespace Omega_Drive_Server
             }
         }
 
-        private static Task<string> Input()
+
+
+
+        private static async void SMTPS_Settings()
         {
-            return Task.FromResult(Console.ReadLine());
+            Server_Application_GUI.SMTPS_Service_Email_Setup();
+
+            string smtps_email = Console.ReadLine();
+
+            if (smtps_email == "E")
+            {
+                SMTPS_Settings();
+            }
+            else
+            {
+                try
+                {
+                    System.Net.Mail.MailAddress valid_email = new System.Net.Mail.MailAddress(smtps_email);
+
+                    smtps_service_email_address = smtps_email;
+
+                    Server_Application_GUI.SMTPS_Service_Password_Setup();
+
+                    string smtps_password = Console.ReadLine();
+
+                    if (smtps_password == "E")
+                    {
+                        SMTPS_Settings();
+                    }
+                    else
+                    {
+
+                    SMTPS_Service_Provider_Setup:
+
+                        Server_Application_GUI.SMTPS_Service_Provider_Setup();
+
+                        smtps_service_email_password = smtps_password;
+
+                        string smtps_service_provider = Console.ReadLine();
+
+                        if (smtps_service_provider == "E")
+                        {
+                            SMTPS_Settings();
+                        }
+                        else if (smtps_service_provider == "Google")
+                        {
+                            smtps_service_provider_name = smtps_service_provider;
+
+                            await Update_Server_Application_Settings_File();
+                        }
+                        else if (smtps_service_provider == "Microsoft")
+                        {
+                            smtps_service_provider_name = smtps_service_provider;
+
+                            await Update_Server_Application_Settings_File();
+                        }
+                        else
+                        {
+                            goto SMTPS_Service_Provider_Setup;
+                        }
+                    }
+                }
+                catch
+                {
+                    SMTPS_Settings();
+                }
+            }
         }
+
+
+        private static async void Cloudmersive_Scan_Enabled()
+        {
+            byte[] eicar = Encoding.ASCII.GetBytes(@"X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*");
+
+            string result = await Server_Cryptographic_Functions_Mitigator.Scan_File_With_Cloudmersive_Initiator(eicar);
+
+            if(result.Contains("Error calling ScanFile:") == false)
+            {
+                Cloudmersive_Virus_Scan_Enabled = true;
+            }
+            else
+            {
+                
+            }
+
+            await Update_Server_Application_Settings_File();
+        }
+
+        private static async void Cloudmersive_Scan_Disabled()
+        {
+            Cloudmersive_Virus_Scan_Enabled = false;
+
+            await Update_Server_Application_Settings_File();
+        }
+
+
+        private async void Set_Cloudmersive_API_Key()
+        {
+            
+        }
+
     }
 }
