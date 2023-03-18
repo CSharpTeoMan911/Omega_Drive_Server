@@ -8,6 +8,148 @@ namespace Omega_Drive_Server
 {
     class Server_Application_Variables
     {
+        /*
+
+            SMTPS SERVICE SCAFFOLD Outlook CONFIG
+            _____________________________________
+
+
+
+            MimeKit.MimeMessage message = new MimeKit.MimeMessage();
+
+
+
+
+            try
+            {
+                message.From.Add(new MimeKit.MailboxAddress("Teodor Mihail", "csharpdev2000@gmail.com"));
+                message.To.Add(new MimeKit.MailboxAddress("User", "teodormihail07@gmail.com"));
+                message.Subject = " CODE";
+                message.Body = new MimeKit.TextPart("plain") { Text = "TEST"};
+
+
+                MailKit.Net.Smtp.SmtpClient client = new MailKit.Net.Smtp.SmtpClient();
+
+                try
+                {
+                    client.Connect("smtp-mail.outlook.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
+                    await client.AuthenticateAsync("csharpdev2000@gmail.com", "");
+                    await client.SendAsync(message);
+                    await client.DisconnectAsync(true);
+
+                }
+                catch (Exception E)
+                {
+
+                    System.Diagnostics.Debug.WriteLine(E.Message);
+                    if (client != null)
+                    {
+                        await client.DisconnectAsync(true);
+                    }
+                }
+                finally
+                {
+                    if (client != null)
+                    {
+                        client.Dispose();
+                    }
+                }
+            }
+            catch (Exception E)
+            {
+
+                System.Diagnostics.Debug.WriteLine(E.Message);
+            }
+            finally
+            {
+                if (message != null)
+                {
+                    message.Dispose();
+                }
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            SMTPS SERVICE SCAFFOLD Gmail CONFIG
+            _____________________________________
+
+
+
+            MimeKit.MimeMessage message = new MimeKit.MimeMessage();
+
+
+
+
+            try
+            {
+                message.From.Add(new MimeKit.MailboxAddress("Student Records System", ""));
+                message.To.Add(new MimeKit.MailboxAddress("User", "teodormihail07@gmail.com"));
+                message.Subject = " CODE";
+                message.Body = new MimeKit.TextPart("plain") { Text = "TEST"};
+
+
+                MailKit.Net.Smtp.SmtpClient client = new MailKit.Net.Smtp.SmtpClient();
+
+                try
+                {
+                    await client.ConnectAsync("smtp.gmail.com", 465, true);
+                    await client.AuthenticateAsync("", "");
+                    await client.SendAsync(message);
+                    await client.DisconnectAsync(true);
+
+                }
+                catch (Exception E)
+                {
+                 
+
+                    if (client != null)
+                    {
+                        await client.DisconnectAsync(true);
+                    }
+                }
+                finally
+                {
+                    if (client != null)
+                    {
+                        client.Dispose();
+                    }
+                }
+            }
+            catch (Exception E)
+            {
+                
+            }
+            finally
+            {
+                if (message != null)
+                {
+                    message.Dispose();
+                }
+            }
+
+
+
+
+         */
+
+
+
+
 
         private static string server_settings_file_name = "application_settings.json";
 
