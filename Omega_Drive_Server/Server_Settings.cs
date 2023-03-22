@@ -14,7 +14,6 @@ namespace Omega_Drive_Server
         public string smtps_service_provider;
         public string smtps_sevice_email;
         public string smtps_service_password;
-        public bool cloudmersive_scan_enabled;
         public string cloudmersive_api_key;
         public string my_sql_username;
         public string my_sql_password;

@@ -167,7 +167,6 @@ namespace Omega_Drive_Server
         protected static List<string> available_connection_ssl_protocol = new List<string>() { "Tls13", "Tls12", "Tls11", "Tls", "Ssl3", "Ssl2"};
         protected static int current_connection_ssl_protocol = 0;
 
-        protected static bool Cloudmersive_Virus_Scan_Enabled;
         protected static string Cloudmersive_Api_Key = String.Empty;
         protected static string smtps_service_provider_name = "Google";
         protected static string smtps_service_email_address = String.Empty;
@@ -176,7 +175,7 @@ namespace Omega_Drive_Server
         protected static string my_sql_database_username = String.Empty;
         protected static string my_sql_database_password = String.Empty;
         protected static string my_sql_database_server = String.Empty;
-        protected static string my_sql_database_name = String.Empty;
+        protected static string my_sql_database_database_name = "omega_drive_db";
 
 
 
@@ -191,12 +190,10 @@ namespace Omega_Drive_Server
             settings.smtps_service_provider = smtps_service_provider_name;
             settings.smtps_sevice_email = Convert.ToBase64String(Encoding.UTF8.GetBytes(smtps_service_email_address));
             settings.smtps_service_password = Convert.ToBase64String(Encoding.UTF8.GetBytes(smtps_service_email_password));
-            settings.cloudmersive_scan_enabled = Cloudmersive_Virus_Scan_Enabled;
             settings.cloudmersive_api_key = Convert.ToBase64String(Encoding.UTF8.GetBytes(Cloudmersive_Api_Key));
             settings.my_sql_username = Convert.ToBase64String(Encoding.UTF8.GetBytes(my_sql_database_username));
             settings.my_sql_password = Convert.ToBase64String(Encoding.UTF8.GetBytes(my_sql_database_password));
             settings.my_sql_server = Convert.ToBase64String(Encoding.UTF8.GetBytes(my_sql_database_server));
-            settings.my_sql_database = Convert.ToBase64String(Encoding.UTF8.GetBytes(my_sql_database_name));
 
 
             byte[] json_serialised_server_application_settings = Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(settings, Newtonsoft.Json.Formatting.Indented));
@@ -257,12 +254,10 @@ namespace Omega_Drive_Server
                     smtps_service_provider_name = settings.smtps_service_provider;
                     smtps_service_email_address = Encoding.UTF8.GetString(Convert.FromBase64String(settings.smtps_sevice_email));
                     smtps_service_email_password = Encoding.UTF8.GetString(Convert.FromBase64String(settings.smtps_service_password));
-                    Cloudmersive_Virus_Scan_Enabled = settings.cloudmersive_scan_enabled;
                     Cloudmersive_Api_Key = Encoding.UTF8.GetString(Convert.FromBase64String(settings.cloudmersive_api_key));
                     my_sql_database_username = Encoding.UTF8.GetString(Convert.FromBase64String(settings.my_sql_username));
                     my_sql_database_password = Encoding.UTF8.GetString(Convert.FromBase64String(settings.my_sql_password));
                     my_sql_database_server = Encoding.UTF8.GetString(Convert.FromBase64String(settings.my_sql_server));
-                    my_sql_database_name = Encoding.UTF8.GetString(Convert.FromBase64String(settings.my_sql_database));
 
 
 

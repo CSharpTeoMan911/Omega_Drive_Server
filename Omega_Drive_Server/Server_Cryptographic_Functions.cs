@@ -173,21 +173,30 @@ namespace Omega_Drive_Server
         {
             bool server_certificate_load_successful = false;
 
-            if(System.IO.File.Exists(server_certificate_name) == true)
+            try
             {
-                string file_path = String.Empty;
-
-                if (System.OperatingSystem.IsWindows() == true)
+                if (System.IO.File.Exists(server_certificate_name) == true)
                 {
-                    file_path = Environment.CurrentDirectory + "\\" + server_certificate_name;
-                }
-                else
-                {
-                    file_path = Environment.CurrentDirectory + "/" + server_certificate_name;
-                }
+                    string file_path = String.Empty;
+
+                    if (System.OperatingSystem.IsWindows() == true)
+                    {
+                        file_path = Environment.CurrentDirectory + "\\" + server_certificate_name;
+                    }
+                    else
+                    {
+                        file_path = Environment.CurrentDirectory + "/" + server_certificate_name;
+                    }
 
 
-                server_certificate = new System.Security.Cryptography.X509Certificates.X509Certificate2(file_path, password);
+                    server_certificate = new System.Security.Cryptography.X509Certificates.X509Certificate2(file_path, password);
+
+                    server_certificate_load_successful = true;
+                }
+            }
+            catch
+            {
+
             }
 
             return Task.FromResult(server_certificate_load_successful);
@@ -200,20 +209,32 @@ namespace Omega_Drive_Server
 
             try
             {
+                Configuration.Default.ApiKey.Clear();
                 Configuration.Default.ApiKey.Add("Apikey", Cloudmersive_Api_Key);
 
                 var Cloudmersive_Api = new ScanApi();
                 
+                
                 Stream s = new MemoryStream(file);
 
                 VirusScanResult Virus_Scan_Result = await Cloudmersive_Api.ScanFileAsync(s);
+               
+                if(Virus_Scan_Result.CleanResult == true)
+                {
+                    virus_scan_result = "Clean result";
+                }
+                else
+                {
+                    virus_scan_result = "Virus found";
+                }
+
                 Debug.WriteLine(Virus_Scan_Result);
             }
             catch(Exception E)
             {
                 virus_scan_result = E.Message;
             }
-            
+
             return virus_scan_result;
         }
     }

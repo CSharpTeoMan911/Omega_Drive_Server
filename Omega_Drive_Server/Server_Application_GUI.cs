@@ -62,17 +62,17 @@ namespace Omega_Drive_Server
             Console.WriteLine("\t\t|||                                                     |||");
             Console.WriteLine("\t\t|||  Enter one of the following options:                |||");
             Console.WriteLine("\t\t|||                                                     |||");
-            Console.WriteLine("\t\t|||  [ S ]  Set the SMTPS service                       |||");
+            Console.WriteLine("\t\t|||  [ S  ]  Set the SMTPS service                      |||");
             Console.WriteLine("\t\t|||                                                     |||");
-            Console.WriteLine("\t\t|||  [ EV ]  Enable Cloudmersive virus scan             |||");
+            Console.WriteLine("\t\t|||  [ SV ]  Set Cloudmersive virus scan                |||");
             Console.WriteLine("\t\t|||                                                     |||");
             Console.WriteLine("\t\t|||  [ DV ]  Disable Cloudmersive virus scan            |||");
             Console.WriteLine("\t\t|||                                                     |||");
-            Console.WriteLine("\t\t|||  [ SV ]  Set Cloudmersive API key                   |||");
-            Console.WriteLine("\t\t|||                                                     |||");
             Console.WriteLine("\t\t|||  [ SM ]  Set MySQL database connection              |||");
             Console.WriteLine("\t\t|||                                                     |||");
-            Console.WriteLine("\t\t|||  [ G ]  Generate a x509 ( SSL ) certificate         |||");
+            Console.WriteLine("\t\t|||  [ G  ]  Generate a x509 ( SSL ) certificate        |||");
+            Console.WriteLine("\t\t|||                                                     |||");
+            Console.WriteLine("\t\t|||  [ SC ]  Set the x509 ( SSL ) certificate           |||");
             Console.WriteLine("\t\t|||                                                     |||");
             Console.WriteLine("\t\t|||  [ EX ]  Exit the settings menu                     |||");
             Console.WriteLine("\t\t|||                                                     |||");
@@ -89,6 +89,15 @@ namespace Omega_Drive_Server
 
 
 
+
+
+
+
+        /// <summary>
+        /// 
+        /// SMTPS service setup
+        /// 
+        /// </summary>
 
 
 
@@ -153,7 +162,88 @@ namespace Omega_Drive_Server
 
 
 
-        public static void Virus_Total_API_Key_Setup()
+        public static void SMTPS_Error_Message()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                         SMTPS                          |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  Invalid email address format                         |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+        public static void SMTPS_Service_Provider_Setup_Successful()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                           SMTPS                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  SMTPS service settup successful                       |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+        public static void SMTPS_Service_Provider_Setup_Cancelled()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                           SMTPS                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  SMTPS service settup cancelled                        |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+
+
+
+
+
+
+
+
+
+        /// <summary>
+        /// 
+        /// Cloudmersive API setup
+        /// 
+        /// </summary>
+
+        public static void Cloudmersive_API_Key_Setup()
         {
             Console.Clear();
 
@@ -168,6 +258,397 @@ namespace Omega_Drive_Server
             Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
 
             Console.Write("\n\n\t\t\t      [ - ] Virus Total API key: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+        public static void Cloudmersive_API_Key_Setup_Error_Message()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                      Cloudmersive                      |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  The API key inserted is not valid. Enter a valid API  |||");
+            Console.WriteLine("\t\t|||  key.                                                  |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+        public static void Cloudmersive_API_Key_Setup_Successful()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                       Cloudmersive                     |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  Cloudmersive API settup successful                    |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+        public static void Cloudmersive_API_Disabled()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                       Cloudmersive                     |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  Cloudmersive virus scan disabled                      |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+
+
+
+
+
+
+
+
+        /// <summary>
+        /// 
+        /// MySQL setup
+        /// 
+        /// </summary>
+
+        public static void MySQL_Username_Setup()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                         MySQL                          |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  Enter the username of the MySQL database account      |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ E ] Exit the configuration                          |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+        public static void MySQL_Password_Setup()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                         MySQL                          |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  Enter the password of the MySQL database account      |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ E ] Exit the configuration                          |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+        public static void MySQL_Server_Setup()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                         MySQL                          |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  Enter the server name on which the database operates  |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ E ] Exit the configuration                          |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+
+        public static void MySQL_Server_Authentification_Error()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                         MySQL                          |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  Invalid credentials or server name                    |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+        public static void MySQL_Server_Authentification_Successful()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                           MySQL                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  MySQL authentification successful                     |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+
+
+
+
+
+
+
+
+        /// <summary>
+        /// 
+        /// X509 certificate generation
+        /// 
+        /// </summary>
+
+        public static void X509_Certificate_Generation_Password_Setup()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                 SERVER X509 CERTIFICATE                |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  Enter the choosen certificate password                |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ E ] Exit the configuration                          |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+        public static void X509_Certificate_Generation_Valid_Time_Period_Setup()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                 SERVER X509 CERTIFICATE                |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  Enter the choosen valid time period in days           |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ E ] Exit the configuration                          |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+        public static void X509_Certificate_Generation_Successful()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                 SERVER X509 CERTIFICATE                |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  X509 certificate generated sucessfully and loaded     |||");
+            Console.WriteLine("\t\t|||  in the server application's directory.                |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+        public static void X509_Certificate_Generation_Unsuccessful()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                 SERVER X509 CERTIFICATE                |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  X509 certificate generation error                     |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+
+
+
+
+        /// <summary>
+        /// 
+        /// X509 certificate generation
+        /// 
+        /// </summary>
+
+
+        public static void X509_Certificate_Setup()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                     X509 CERTIFICATE                   |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  Enter the password of the X509 certificate            |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ E ] Exit the configuration                          |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+        public static void X509_Certificate_Setup_Successful()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                    X509 CERTIFICATE                    |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  X509 setup successful                                 |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+        public static void X509_Certificate_Setup_Error()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                    X509 CERTIFICATE                    |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  X509 setup unsuccessful. Either the password provided |||");
+            Console.WriteLine("\t\t|||  is not valid or the certificate is invalid.           |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+        public static void X509_Certificate_Setup_Cancelled()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                    X509 CERTIFICATE                    |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  X509 setup cancelled                                  |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
 
             Console.ForegroundColor = ConsoleColor.White;
         }
