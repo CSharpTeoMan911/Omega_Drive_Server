@@ -116,11 +116,37 @@ namespace Omega_Drive_Server
 
                 string settings_input = Console.ReadLine();
 
-                if (settings_input == "S")
+                if (settings_input == "P")
+                {
+                    bool Server_Port_Setup_Cancelled = await Server_Port_Number_Setup();
+
+                    if(Server_Port_Setup_Cancelled == true)
+                    {
+                        Server_Application_GUI.Port_Setup_Cancelled();
+                    }
+                    else
+                    {
+                        Server_Application_GUI.Port_Setup_Successful();
+                    }
+
+                    Console.ReadLine();
+
+                    goto Settings_Menu;
+                }
+                else if (settings_input == "PR")
+                {
+                    await Server_SSL_Protocol_Setup();
+
+                    Server_Application_GUI.SSL_Protocol_Setup_Finsished();
+                    Console.ReadLine();
+
+                    goto Settings_Menu;
+                }
+                else if (settings_input == "S")
                 {
                     bool SMTPS_Service_Setup_Cancelled = await SMTPS_Settings();
 
-                    if(SMTPS_Service_Setup_Cancelled == true)
+                    if (SMTPS_Service_Setup_Cancelled == true)
                     {
                         Server_Application_GUI.SMTPS_Service_Provider_Setup_Successful();
                     }
@@ -128,16 +154,24 @@ namespace Omega_Drive_Server
                     {
                         Server_Application_GUI.SMTPS_Service_Provider_Setup_Cancelled();
                     }
-                    
+
                     Console.ReadLine();
 
                     goto Settings_Menu;
                 }
                 else if (settings_input == "SV")
                 {
-                    await Set_Cloudmersive_Scan_API_Key();
+                    bool Cloudmersive_Setup_Cancelled = await Set_Cloudmersive_Scan_API_Key();
 
-                    Server_Application_GUI.Cloudmersive_API_Key_Setup_Successful();
+                    if(Cloudmersive_Setup_Cancelled == true)
+                    {
+                        Server_Application_GUI.Cloudmersive_API_Key_Setup_Cancelled();
+                    }
+                    else
+                    {
+                        Server_Application_GUI.Cloudmersive_API_Key_Setup_Successful();
+                    }
+
                     Console.ReadLine();
 
                     goto Settings_Menu;
@@ -164,7 +198,7 @@ namespace Omega_Drive_Server
                 {
                     bool x509_Certificate_Generation_Result_Is_Successful = await Generate_X509_Certificate();
 
-                    if(x509_Certificate_Generation_Result_Is_Successful == true)
+                    if (x509_Certificate_Generation_Result_Is_Successful == true)
                     {
                         Server_Application_GUI.X509_Certificate_Generation_Successful();
                     }
@@ -270,6 +304,81 @@ namespace Omega_Drive_Server
 
 
 
+        private static async Task<bool> Server_Port_Number_Setup()
+        {
+            bool Server_Port_Setup_Cancelled = true;
+
+            Server_Application_GUI.Port_Setup();
+
+            try
+            {
+                string input = Console.ReadLine();
+
+
+                if (input != "E")
+                {
+                    double port_number_buffer = Convert.ToDouble(input);
+                    port_number = Convert.ToInt32(input);
+                    await Update_Server_Application_Settings_File();
+
+                    Server_Port_Setup_Cancelled = false;
+                }
+            }
+            catch
+            {
+                await Server_Port_Number_Setup();
+            }
+
+            return Server_Port_Setup_Cancelled;
+        }
+
+
+
+
+        private static async Task<bool> Server_SSL_Protocol_Setup()
+        {
+            Server_Application_GUI.SSL_Protocol_Setup();
+            string input = Console.ReadLine();
+
+            if(input == "N")
+            {
+                lock (available_connection_ssl_protocol)
+                {
+                    if (current_connection_ssl_protocol < available_connection_ssl_protocol.Count)
+                    {
+                        current_connection_ssl_protocol++;
+                    }
+                }
+
+                await Update_Server_Application_Settings_File();
+
+                await Server_SSL_Protocol_Setup();
+            }
+            else if(input == "P")
+            {
+                if (current_connection_ssl_protocol > 0)
+                {
+                    current_connection_ssl_protocol--;
+                }
+
+                await Update_Server_Application_Settings_File();
+
+                await Server_SSL_Protocol_Setup();
+            }
+            else if(input == "E")
+            {
+                return true;
+            }
+            else
+            {
+                await Server_SSL_Protocol_Setup();
+            }
+
+            return true;
+        }
+
+
+
 
         private static async Task<bool> SMTPS_Settings()
         {
@@ -283,7 +392,10 @@ namespace Omega_Drive_Server
                 {
                     System.Net.Mail.MailAddress valid_email = new System.Net.Mail.MailAddress(smtps_email);
 
-                    smtps_service_email_address = smtps_email;
+                    lock (smtps_service_email_address)
+                    {
+                        smtps_service_email_address = smtps_email;
+                    }
 
                     Server_Application_GUI.SMTPS_Service_Password_Setup();
 
@@ -291,11 +403,15 @@ namespace Omega_Drive_Server
 
                     if (smtps_password != "E")
                     {
+
+                        lock (smtps_service_email_password)
+                        {
+                            smtps_service_email_password = smtps_password;
+                        }
+
                     SMTPS_Service_Provider_Setup:
 
                         Server_Application_GUI.SMTPS_Service_Provider_Setup();
-
-                        smtps_service_email_password = smtps_password;
 
                         string smtps_service_provider = Console.ReadLine();
 
@@ -305,7 +421,10 @@ namespace Omega_Drive_Server
                         }
                         else if (smtps_service_provider == "Google")
                         {
-                            smtps_service_provider_name = smtps_service_provider;
+                            lock (smtps_service_provider_name)
+                            {
+                                smtps_service_provider_name = smtps_service_provider;
+                            }
 
                             await Update_Server_Application_Settings_File();
 
@@ -313,7 +432,10 @@ namespace Omega_Drive_Server
                         }
                         else if (smtps_service_provider == "Microsoft")
                         {
-                            smtps_service_provider_name = smtps_service_provider;
+                            lock (smtps_service_provider_name)
+                            {
+                                smtps_service_provider_name = smtps_service_provider;
+                            }
 
                             await Update_Server_Application_Settings_File();
 
@@ -349,12 +471,19 @@ namespace Omega_Drive_Server
 
         private static async Task<bool> Set_Cloudmersive_Scan_API_Key()
         {
+            bool Cloudmersive_Setup_Cancelled = true;
+
             Server_Application_GUI.Cloudmersive_API_Key_Setup();
 
             string input = Console.ReadLine();
 
-            string Cloudmersive_Api_Key_Buffer = Cloudmersive_Api_Key;
-            Cloudmersive_Api_Key = input;
+            string Cloudmersive_Api_Key_Buffer = String.Empty;
+
+            lock(Cloudmersive_Api_Key)
+            {
+                Cloudmersive_Api_Key_Buffer = Cloudmersive_Api_Key;
+                Cloudmersive_Api_Key = input;
+            }
 
             if (await Verify_If_Cloudmersive_API_Is_Valid() == false)
             {
@@ -363,24 +492,31 @@ namespace Omega_Drive_Server
                     Server_Application_GUI.Cloudmersive_API_Key_Setup_Error_Message();
                     Console.ReadLine();
 
-                    Cloudmersive_Api_Key = Cloudmersive_Api_Key_Buffer;
+                    lock (Cloudmersive_Api_Key)
+                    {
+                        Cloudmersive_Api_Key = Cloudmersive_Api_Key_Buffer;
+                    }
 
                     await Set_Cloudmersive_Scan_API_Key();
                 }
             }
             else
             {
+                Cloudmersive_Setup_Cancelled = false;
                 await Update_Server_Application_Settings_File();
             }
 
 
-            return true;
+            return Cloudmersive_Setup_Cancelled;
         }
 
 
         private static async Task<bool> Cloudmersive_Scan_Disabled()
         {
-            Cloudmersive_Api_Key = String.Empty;
+            lock (Cloudmersive_Api_Key)
+            {
+                Cloudmersive_Api_Key = String.Empty;
+            }
             
             return await Update_Server_Application_Settings_File();
         }
@@ -428,9 +564,18 @@ namespace Omega_Drive_Server
                         {
                             await connection.OpenAsync();
 
-                            my_sql_database_username = my_sql_database_username_buffer;
-                            my_sql_database_password = my_sql_database_password_buffer;
-                            my_sql_database_server = my_sql_database_server_buffer;
+                            lock(my_sql_database_username)
+                            {
+                                lock(my_sql_database_password)
+                                {
+                                    lock(my_sql_database_server)
+                                    {
+                                        my_sql_database_username = my_sql_database_username_buffer;
+                                        my_sql_database_password = my_sql_database_password_buffer;
+                                        my_sql_database_server = my_sql_database_server_buffer;
+                                    }
+                                }
+                            }
 
                             await Update_Server_Application_Settings_File();
                         }
@@ -521,7 +666,11 @@ namespace Omega_Drive_Server
                 }
                 else
                 {
-                    server_ssl_certificate_password = certificate_password;
+                    lock(server_ssl_certificate_password)
+                    {
+                        server_ssl_certificate_password = certificate_password;
+                    }
+
                     await Update_Server_Application_Settings_File();
                 }
             }

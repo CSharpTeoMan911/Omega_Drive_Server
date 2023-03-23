@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Diagnostics;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Cloudmersive.APIClient.NETCore.VirusScan.Api;
 using Cloudmersive.APIClient.NETCore.VirusScan.Client;
@@ -179,7 +176,7 @@ namespace Omega_Drive_Server
                 {
                     string file_path = String.Empty;
 
-                    if (System.OperatingSystem.IsWindows() == true)
+                    if (OperatingSystem.IsWindows() == true)
                     {
                         file_path = Environment.CurrentDirectory + "\\" + server_certificate_name;
                     }
@@ -213,9 +210,9 @@ namespace Omega_Drive_Server
                 Configuration.Default.ApiKey.Add("Apikey", Cloudmersive_Api_Key);
 
                 var Cloudmersive_Api = new ScanApi();
-                
-                
-                Stream s = new MemoryStream(file);
+
+
+                System.IO.Stream s = new System.IO.MemoryStream(file);
 
                 VirusScanResult Virus_Scan_Result = await Cloudmersive_Api.ScanFileAsync(s);
                

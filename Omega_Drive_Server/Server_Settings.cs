@@ -18,6 +18,5 @@ namespace Omega_Drive_Server
         public string my_sql_username;
         public string my_sql_password;
         public string my_sql_server;
-        public string my_sql_database;
     }
 }

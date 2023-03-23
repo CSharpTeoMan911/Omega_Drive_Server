@@ -62,6 +62,10 @@ namespace Omega_Drive_Server
             Console.WriteLine("\t\t|||                                                     |||");
             Console.WriteLine("\t\t|||  Enter one of the following options:                |||");
             Console.WriteLine("\t\t|||                                                     |||");
+            Console.WriteLine("\t\t|||  [ P  ]  Set the server's port number               |||");
+            Console.WriteLine("\t\t|||                                                     |||");
+            Console.WriteLine("\t\t|||  [ PR ]  Set the server's choosen SSL protocol      |||");
+            Console.WriteLine("\t\t|||                                                     |||");
             Console.WriteLine("\t\t|||  [ S  ]  Set the SMTPS service                      |||");
             Console.WriteLine("\t\t|||                                                     |||");
             Console.WriteLine("\t\t|||  [ SV ]  Set Cloudmersive virus scan                |||");
@@ -82,6 +86,163 @@ namespace Omega_Drive_Server
 
             Console.ForegroundColor = ConsoleColor.White;
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /// <summary>
+        /// 
+        /// Port number setup
+        /// 
+        /// </summary>
+
+
+        public static void Port_Setup()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                     Port number setup                  |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  Enter the port number on which the server will listen |||");
+            Console.WriteLine("\t\t|||  for client connections                                |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ E ] Exit the configuration                          |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+        public static void Port_Setup_Successful()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                     Port number setup                  |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  SMTPS service settup successful                       |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+        public static void Port_Setup_Cancelled()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                     Port number setup                  |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  SMTPS service settup cancelled                        |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+
+
+
+
+
+
+
+        /// <summary>
+        /// 
+        /// SLL protocol setup
+        /// 
+        /// </summary>
+
+
+        public static void SSL_Protocol_Setup()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                     SSL protocol setup                 |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  SSL Protocol: " + available_connection_ssl_protocol[current_connection_ssl_protocol] + "                                   |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ N ] Next protocol                                   |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ P ] Previous protocol                               |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ E ] Exit the configuration                          |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+
+        public static void SSL_Protocol_Setup_Finsished()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                     SSL protocol setup                 |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  SSL protocol setup finished                           |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+
+
+
+
 
 
 
@@ -237,6 +398,9 @@ namespace Omega_Drive_Server
 
 
 
+
+
+
         /// <summary>
         /// 
         /// Cloudmersive API setup
@@ -252,6 +416,10 @@ namespace Omega_Drive_Server
             Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
             Console.WriteLine("\t\t|||                      Cloudmersive                    |||");
             Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                      |||");
+            Console.WriteLine("\t\t|||  Enter the cloudmersive API key. If you do not have  |||");
+            Console.WriteLine("\t\t|||  one go to https://cloudmersive.com/virus-api and    |||");
+            Console.WriteLine("\t\t|||  create an account and then create an API key.       |||");
             Console.WriteLine("\t\t|||                                                      |||");
             Console.WriteLine("\t\t|||  [ E ] Exit the configuration                        |||");
             Console.WriteLine("\t\t|||                                                      |||");
@@ -296,6 +464,28 @@ namespace Omega_Drive_Server
             Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
             Console.WriteLine("\t\t|||                                                        |||");
             Console.WriteLine("\t\t|||  Cloudmersive API settup successful                    |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+
+            Console.Write("\n\n\t\t\t      [ - ] Input: ");
+
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+
+        public static void Cloudmersive_API_Key_Setup_Cancelled()
+        {
+            Console.Clear();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                       Cloudmersive                     |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                        |||");
+            Console.WriteLine("\t\t|||  Cloudmersive API settup cancelled                     |||");
             Console.WriteLine("\t\t|||                                                        |||");
             Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
             Console.WriteLine("\t\t|||                                                        |||");
