@@ -9,7 +9,7 @@ namespace Omega_Drive_Server
 {
     class Client_Connections:Server_Application_Variables
     {
-        protected static async Task<bool> Secure_Client_Connection(System.Net.Sockets.Socket client)
+        internal async Task<bool> Secure_Client_Connection(System.Net.Sockets.Socket client)
         {
             try
             {
@@ -98,48 +98,51 @@ namespace Omega_Drive_Server
             int bytes_per_second = 0;
 
 
-            System.Net.NetworkInformation.Ping ping = new System.Net.NetworkInformation.Ping();
-
-
-            System.Net.NetworkInformation.PingOptions ping_options = new System.Net.NetworkInformation.PingOptions();
-            ping_options.DontFragment = true;
-
-
-
-            while (round_trip_time_counter < 10)
+            if (IP_Address != null)
             {
-                System.Net.NetworkInformation.PingReply ping_reply = ping.Send(IP_Address, 100, new byte[1500], ping_options);
+                System.Net.NetworkInformation.Ping ping = new System.Net.NetworkInformation.Ping();
 
-                if(ping_reply.Status == System.Net.NetworkInformation.IPStatus.Success)
+
+                System.Net.NetworkInformation.PingOptions ping_options = new System.Net.NetworkInformation.PingOptions();
+                ping_options.DontFragment = true;
+
+
+
+                while (round_trip_time_counter < 10)
                 {
-                    calculated_average_round_trip_time += (int)ping_reply.RoundtripTime;
+                    System.Net.NetworkInformation.PingReply ping_reply = ping.Send(IP_Address, 100, new byte[1500], ping_options);
+
+                    if (ping_reply.Status == System.Net.NetworkInformation.IPStatus.Success)
+                    {
+                        calculated_average_round_trip_time += (int)ping_reply.RoundtripTime;
+                    }
+                    else
+                    {
+                        bytes_per_second = -1;
+                        goto Ping_Failed;
+                    }
+
+                    round_trip_time_counter++;
+                }
+
+
+
+                if (calculated_average_round_trip_time > 0)
+                {
+                    calculated_average_round_trip_time = calculated_average_round_trip_time / 10;
                 }
                 else
                 {
-                    bytes_per_second = -1;
-                    goto Ping_Failed;
+                    calculated_average_round_trip_time = 1;
                 }
 
-                round_trip_time_counter++;
-            }
 
+                bytes_per_second = 24 / calculated_average_round_trip_time * 125000;
 
-
-            if(calculated_average_round_trip_time > 0)
-            {
-                calculated_average_round_trip_time = calculated_average_round_trip_time / 10;
-            }
-            else
-            {
-                calculated_average_round_trip_time = 1;
-            }
-
-
-            bytes_per_second = 24 / calculated_average_round_trip_time * 125000;
-
-            if(bytes_per_second < 1)
-            {
-                bytes_per_second = 1;
+                if (bytes_per_second < 1)
+                {
+                    bytes_per_second = 1;
+                }
             }
 
 

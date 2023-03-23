@@ -7,36 +7,9 @@ namespace Omega_Drive_Server
 {
     class Program:Server_Application_Variables
     {
-        private sealed class Server_Cryptographic_Functions_Mitigator:Server_Cryptographic_Functions
-        {
-            internal static async Task<bool> Create_X509_Server_Certificate_Initiator(string password, int certificate_valid_time_period_in_days)
-            {
-                return await Create_X509_Server_Certificate(password, certificate_valid_time_period_in_days);
-            }
+        private static Client_Connections client_connections = new Client_Connections();
+        private static Server_Cryptographic_Functions server_cryptographic_functions = new Server_Cryptographic_Functions();
 
-            internal static async Task<bool> Delete_X509_Server_Certificate_Initiator()
-            {
-                return await Delete_X509_Server_Certificate();
-            }
-
-            internal static async Task<bool> Load_Server_Certificate_In_Application_Memory_Initiator(string password)
-            {
-                return await Load_Server_Certificate_In_Application_Memory(password);
-            }
-
-            internal static async Task<string> Scan_File_With_Cloudmersive_Initiator(byte[] file)
-            {
-                return await Scan_File_With_Cloudmersive(file);
-            }
-        }
-
-        private sealed class Client_Connections_Mitigator:Client_Connections
-        {
-            internal static async Task<bool> Secure_Client_Connection_Initiator(System.Net.Sockets.Socket client)
-            {
-                return await Secure_Client_Connection(client);
-            }
-        }
 
 
         static void Main(string[] args)
@@ -73,7 +46,7 @@ namespace Omega_Drive_Server
                 {
                     server_opened = true;
 
-                    System.Threading.Thread client_connection_thread = new System.Threading.Thread(async () =>
+                    System.Threading.Thread client_connection_thread = new System.Threading.Thread(() =>
                     {
                         Server_Operation();
                     });
@@ -293,7 +266,7 @@ namespace Omega_Drive_Server
 
                 while (server_opened == true)
                 {
-                    await Client_Connections_Mitigator.Secure_Client_Connection_Initiator(server_socket.Accept());
+                    await client_connections.Secure_Client_Connection(server_socket.Accept());
                 }
             }
             catch(Exception E) 
@@ -527,7 +500,7 @@ namespace Omega_Drive_Server
 
             byte[] eicar = Encoding.ASCII.GetBytes(@"X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*");
 
-            string result = await Server_Cryptographic_Functions_Mitigator.Scan_File_With_Cloudmersive_Initiator(eicar);
+            string result = await server_cryptographic_functions.Scan_File_With_Cloudmersive(eicar);
 
 
             if (result.Contains("Virus found"))
@@ -633,7 +606,7 @@ namespace Omega_Drive_Server
             }
 
 
-            x509_Certificate_Generation_Result_Is_Successful = await Server_Cryptographic_Functions_Mitigator.Create_X509_Server_Certificate_Initiator(certificate_password, certificate_valid_time_period);
+            x509_Certificate_Generation_Result_Is_Successful = await server_cryptographic_functions.Create_X509_Server_Certificate(certificate_password, certificate_valid_time_period);
 
             if(x509_Certificate_Generation_Result_Is_Successful == false)
             {
@@ -655,7 +628,7 @@ namespace Omega_Drive_Server
 
             if(certificate_password != "E")
             {
-                bool X509_Certificate_Setup_Result = await Server_Cryptographic_Functions_Mitigator.Load_Server_Certificate_In_Application_Memory_Initiator(certificate_password);
+                bool X509_Certificate_Setup_Result = await server_cryptographic_functions.Load_Server_Certificate_In_Application_Memory(certificate_password);
 
                 if(X509_Certificate_Setup_Result == false)
                 {

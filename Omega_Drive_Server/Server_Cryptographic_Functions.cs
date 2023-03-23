@@ -12,7 +12,7 @@ namespace Omega_Drive_Server
         private static string server_certificate_name = "Omega_Drive.crt";
 
 
-        protected static async Task<bool> Create_X509_Server_Certificate(string password, int certificate_valid_time_period_in_days)
+        internal async Task<bool> Create_X509_Server_Certificate(string password, int certificate_valid_time_period_in_days)
         {
 
             bool server_certificate_creation_successful = false;
@@ -146,7 +146,7 @@ namespace Omega_Drive_Server
         }
 
 
-        protected static Task<bool> Delete_X509_Server_Certificate()
+        internal Task<bool> Delete_X509_Server_Certificate()
         {
             bool server_certificate_deletion_result_successful = false;
 
@@ -166,7 +166,7 @@ namespace Omega_Drive_Server
         }
 
 
-        protected static Task<bool> Load_Server_Certificate_In_Application_Memory(string password)
+        internal Task<bool> Load_Server_Certificate_In_Application_Memory(string password)
         {
             bool server_certificate_load_successful = false;
 
@@ -200,7 +200,7 @@ namespace Omega_Drive_Server
         }
 
 
-        protected static async Task<string> Scan_File_With_Cloudmersive(byte[] file)
+        internal async Task<string> Scan_File_With_Cloudmersive(byte[] file)
         {
             string virus_scan_result = String.Empty;
 

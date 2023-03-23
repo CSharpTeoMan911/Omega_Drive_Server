@@ -8,148 +8,6 @@ namespace Omega_Drive_Server
 {
     class Server_Application_Variables
     {
-        /*
-
-            SMTPS SERVICE SCAFFOLD Outlook CONFIG
-            _____________________________________
-
-
-
-            MimeKit.MimeMessage message = new MimeKit.MimeMessage();
-
-
-
-
-            try
-            {
-                message.From.Add(new MimeKit.MailboxAddress("Teodor Mihail", "csharpdev2000@gmail.com"));
-                message.To.Add(new MimeKit.MailboxAddress("User", "teodormihail07@gmail.com"));
-                message.Subject = " CODE";
-                message.Body = new MimeKit.TextPart("plain") { Text = "TEST"};
-
-
-                MailKit.Net.Smtp.SmtpClient client = new MailKit.Net.Smtp.SmtpClient();
-
-                try
-                {
-                    client.Connect("smtp-mail.outlook.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
-                    await client.AuthenticateAsync("csharpdev2000@gmail.com", "");
-                    await client.SendAsync(message);
-                    await client.DisconnectAsync(true);
-
-                }
-                catch (Exception E)
-                {
-
-                    System.Diagnostics.Debug.WriteLine(E.Message);
-                    if (client != null)
-                    {
-                        await client.DisconnectAsync(true);
-                    }
-                }
-                finally
-                {
-                    if (client != null)
-                    {
-                        client.Dispose();
-                    }
-                }
-            }
-            catch (Exception E)
-            {
-
-                System.Diagnostics.Debug.WriteLine(E.Message);
-            }
-            finally
-            {
-                if (message != null)
-                {
-                    message.Dispose();
-                }
-            }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            SMTPS SERVICE SCAFFOLD Gmail CONFIG
-            _____________________________________
-
-
-
-            MimeKit.MimeMessage message = new MimeKit.MimeMessage();
-
-
-
-
-            try
-            {
-                message.From.Add(new MimeKit.MailboxAddress("Student Records System", ""));
-                message.To.Add(new MimeKit.MailboxAddress("User", "teodormihail07@gmail.com"));
-                message.Subject = " CODE";
-                message.Body = new MimeKit.TextPart("plain") { Text = "TEST"};
-
-
-                MailKit.Net.Smtp.SmtpClient client = new MailKit.Net.Smtp.SmtpClient();
-
-                try
-                {
-                    await client.ConnectAsync("smtp.gmail.com", 465, true);
-                    await client.AuthenticateAsync("", "");
-                    await client.SendAsync(message);
-                    await client.DisconnectAsync(true);
-
-                }
-                catch (Exception E)
-                {
-                 
-
-                    if (client != null)
-                    {
-                        await client.DisconnectAsync(true);
-                    }
-                }
-                finally
-                {
-                    if (client != null)
-                    {
-                        client.Dispose();
-                    }
-                }
-            }
-            catch (Exception E)
-            {
-                
-            }
-            finally
-            {
-                if (message != null)
-                {
-                    message.Dispose();
-                }
-            }
-
-
-
-
-         */
-
-
-
-
 
         private static string server_settings_file_name = "application_settings.json";
 
@@ -157,9 +15,13 @@ namespace Omega_Drive_Server
         protected static System.Net.Sockets.Socket server_socket;
         protected static System.Timers.Timer server_functionality_timer;
 
+
+
         protected static bool server_opened;
         protected static int port_number = 1024;
         protected static int number_of_clients_backlog = 1000;
+
+
 
         protected static System.Security.Cryptography.X509Certificates.X509Certificate2 server_certificate;
         protected static string server_ssl_certificate_password = String.Empty;
@@ -167,15 +29,24 @@ namespace Omega_Drive_Server
         protected static List<string> available_connection_ssl_protocol = new List<string>() { "Tls13", "Tls12", "Tls11", "Tls  ", "Ssl3 ", "Ssl2 "};
         protected static int current_connection_ssl_protocol = 0;
 
+
+
         protected static string Cloudmersive_Api_Key = String.Empty;
         protected static string smtps_service_provider_name = "Google";
         protected static string smtps_service_email_address = String.Empty;
         protected static string smtps_service_email_password = String.Empty;
 
+
+
         protected static string my_sql_database_username = String.Empty;
         protected static string my_sql_database_password = String.Empty;
         protected static string my_sql_database_server = String.Empty;
         protected static string my_sql_database_database_name = "omega_drive_db";
+
+
+
+
+
 
 
         protected static Task<bool> SSSL_Protocol_Selection()
@@ -397,6 +268,82 @@ namespace Omega_Drive_Server
             await Create_Server_Application_Settings_File();
 
             return server_settings_update_is_successful;
+        }
+
+
+
+
+        protected static async Task<bool> SMTPS_Service(string user_email, string code, string function)
+        {
+            bool smtps_service_result = false;
+
+            MimeKit.MimeMessage message = new MimeKit.MimeMessage();
+
+            try
+            {
+                message.From.Add(new MimeKit.MailboxAddress("Omega Drive", smtps_service_email_address));
+                message.To.Add(new MimeKit.MailboxAddress("User", user_email));
+                message.Subject = function + " code";
+                message.Body = new MimeKit.TextPart("plain") { Text = "One time " + function + " code: " + code };
+
+
+                MailKit.Net.Smtp.SmtpClient client = new MailKit.Net.Smtp.SmtpClient();
+
+                try
+                {
+                    string smtp_server = String.Empty;
+                    int smtp_server_port = 0;
+
+
+                    switch(smtps_service_provider_name)
+                    {
+                        case "Google":
+                            smtp_server = "smtp.gmail.com";
+                            smtp_server_port = 465;
+                            break;
+
+                        case "Microsoft":
+                            smtp_server = "smtp-mail.outlook.com";
+                            smtp_server_port = 587;
+                            break;
+                    }
+
+
+                    client.Connect(smtp_server, smtp_server_port, MailKit.Security.SecureSocketOptions.StartTls);
+
+                    await client.AuthenticateAsync(smtps_service_email_address, smtps_service_email_password);
+                    await client.SendAsync(message);
+                    await client.DisconnectAsync(true);
+
+                }
+                catch (Exception E)
+                {
+                    if (client != null)
+                    {
+                        await client.DisconnectAsync(true);
+                    }
+                }
+                finally
+                {
+                    if (client != null)
+                    {
+                        client.Dispose();
+                    }
+                }
+            }
+            catch (Exception E)
+            {
+
+            }
+            finally
+            {
+                if (message != null)
+                {
+                    message.Dispose();
+                }
+            }
+
+            return smtps_service_result;
         }
     }
 }
