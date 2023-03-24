@@ -145,28 +145,7 @@ namespace Omega_Drive_Server
             return server_certificate_creation_successful;
         }
 
-
-        internal Task<bool> Delete_X509_Server_Certificate()
-        {
-            bool server_certificate_deletion_result_successful = false;
-
-
-            try
-            {
-                if(System.IO.File.Exists(server_certificate_name) == true)
-                {
-                    System.IO.File.Delete(server_certificate_name);
-                }
-
-                server_certificate_deletion_result_successful = true;
-            }
-            catch{ }
-
-            return Task.FromResult(server_certificate_deletion_result_successful);
-        }
-
-
-        internal Task<bool> Load_Server_Certificate_In_Application_Memory(string password)
+        internal Task<bool> Load_Server_Certificate_In_Application_Memory()
         {
             bool server_certificate_load_successful = false;
 
@@ -186,7 +165,7 @@ namespace Omega_Drive_Server
                     }
 
 
-                    server_certificate = new System.Security.Cryptography.X509Certificates.X509Certificate2(file_path, password);
+                    server_certificate = new System.Security.Cryptography.X509Certificates.X509Certificate2(file_path, server_ssl_certificate_password);
 
                     server_certificate_load_successful = true;
                 }

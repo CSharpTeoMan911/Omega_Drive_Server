@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -9,6 +11,10 @@ namespace Omega_Drive_Server
 {
     class Client_Connections:Server_Application_Variables
     {
+        private int current_connection_speed = 0;
+        private byte[] server_response = Encoding.UTF8.GetBytes("OK");
+        private byte[] client_response = new byte[Encoding.UTF8.GetBytes("OK").Length];
+
         internal async Task<bool> Secure_Client_Connection(System.Net.Sockets.Socket client)
         {
             try
@@ -16,25 +22,95 @@ namespace Omega_Drive_Server
                 client.SendBufferSize = 18000;
                 client.ReceiveBufferSize = 18000;
 
-                int connection_speed = await Connection_Speed_Calculator(((IPEndPoint)client.RemoteEndPoint).Address);
+                await Connection_Speed_Calculator(((IPEndPoint)client.RemoteEndPoint).Address);
 
-                if(connection_speed > 0)
+                if(current_connection_speed > 0)
                 {
-                    int timeout = 18000 / connection_speed + 1000;
-
-                    client.SendTimeout = timeout;
-                    client.ReceiveTimeout = timeout;
-
+                    client.SendTimeout = 1000;
+                    client.ReceiveTimeout = 1000;
 
                     System.Net.Sockets.NetworkStream client_network_stream = new System.Net.Sockets.NetworkStream(client);
 
                     try
                     {
-                        System.Net.Security.SslStream client_secure_socket_layer_stream = new System.Net.Security.SslStream(client_network_stream, false);
+                        System.Net.Security.SslStream client_secure_socket_layer_stream = new System.Net.Security.SslStream(client_network_stream, false, null, null, System.Net.Security.EncryptionPolicy.RequireEncryption);
 
                         try
                         {
                             client_secure_socket_layer_stream.AuthenticateAsServer(server_certificate, false, connection_ssl_protocol, false);
+
+
+
+
+
+                            byte[] client_payload_size_buffer = new byte[1024];
+
+                            await Calculate_Timeout(client, client_payload_size_buffer.Length);
+
+                            await client_secure_socket_layer_stream.ReadAsync(client_payload_size_buffer, 0, client_payload_size_buffer.Length);
+
+                            await client_secure_socket_layer_stream.FlushAsync();
+
+
+
+
+
+                            await Calculate_Timeout(client, server_response.Length);
+
+                            await client_secure_socket_layer_stream.WriteAsync(server_response, 0, server_response.Length);
+
+                            await client_secure_socket_layer_stream.FlushAsync();
+
+
+
+
+
+                            byte[] client_payload_buffer = new byte[BitConverter.ToInt32(client_payload_size_buffer, 0)];
+
+                            await Calculate_Timeout(client, client_payload_buffer.Length);
+
+                            int total_bytes_read = 0;
+
+                            while (total_bytes_read < client_payload_buffer.Length)
+                            {
+                                total_bytes_read += await client_secure_socket_layer_stream.ReadAsync(client_payload_buffer, total_bytes_read, client_payload_buffer.Length - total_bytes_read);
+                            }
+
+
+
+
+                            byte[] server_payload = new byte[1024];
+
+                            byte[] server_payload_length = new byte[BitConverter.ToInt32(server_payload)];
+
+                            await Calculate_Timeout(client, server_payload_length.Length);
+
+                            await client_secure_socket_layer_stream.WriteAsync(server_payload_length, 0, server_payload_length.Length);
+
+                            await client_secure_socket_layer_stream.FlushAsync();
+
+
+
+
+
+                            await Calculate_Timeout(client, client_response.Length);
+
+                            await client_secure_socket_layer_stream.ReadAsync(client_response, 0, client_response.Length);
+
+                            await client_secure_socket_layer_stream.FlushAsync();
+
+
+
+
+
+                            
+
+                            await Calculate_Timeout(client, server_payload.Length);
+
+                            await client_secure_socket_layer_stream.WriteAsync(server_payload, 0, server_payload.Length);
+
+                            await client_secure_socket_layer_stream.FlushAsync();
+
                         }
                         catch (Exception E)
                         {
@@ -71,7 +147,6 @@ namespace Omega_Drive_Server
             }
             catch (Exception E)
             {
-                System.Diagnostics.Debug.WriteLine(E.Message);
                 if (client != null)
                 {
                     client.Close();
@@ -91,7 +166,7 @@ namespace Omega_Drive_Server
         }
 
 
-        private static Task<int> Connection_Speed_Calculator(System.Net.IPAddress IP_Address)
+        private Task<bool> Connection_Speed_Calculator(System.Net.IPAddress IP_Address)
         {
             int round_trip_time_counter = 0;
             int calculated_average_round_trip_time = 0;
@@ -145,10 +220,19 @@ namespace Omega_Drive_Server
                 }
             }
 
+            current_connection_speed = bytes_per_second;
 
             Ping_Failed:
-            return Task.FromResult(bytes_per_second);
+            return Task.FromResult(true);
+        }
 
+
+        private Task<bool> Calculate_Timeout(System.Net.Sockets.Socket client, int payload_size)
+        {
+            client.SendBufferSize = payload_size / current_connection_speed + 1000;
+            client.ReceiveBufferSize = payload_size / current_connection_speed + 1000;
+
+            return Task.FromResult(true);
         }
     }
 }

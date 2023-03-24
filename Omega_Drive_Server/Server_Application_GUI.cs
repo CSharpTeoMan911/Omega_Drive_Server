@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -75,8 +76,6 @@ namespace Omega_Drive_Server
             Console.WriteLine("\t\t|||  [ SM ]  Set MySQL database connection              |||");
             Console.WriteLine("\t\t|||                                                     |||");
             Console.WriteLine("\t\t|||  [ G  ]  Generate a x509 ( SSL ) certificate        |||");
-            Console.WriteLine("\t\t|||                                                     |||");
-            Console.WriteLine("\t\t|||  [ SC ]  Set the x509 ( SSL ) certificate           |||");
             Console.WriteLine("\t\t|||                                                     |||");
             Console.WriteLine("\t\t|||  [ EX ]  Exit the settings menu                     |||");
             Console.WriteLine("\t\t|||                                                     |||");
@@ -754,88 +753,31 @@ namespace Omega_Drive_Server
         /// 
         /// </summary>
 
-
-        public static void X509_Certificate_Setup()
+        public static void X509_Certificate_Loadup_Error()
         {
             Console.Clear();
 
             Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-            Console.WriteLine("\t\t|||                     X509 CERTIFICATE                   |||");
-            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-            Console.WriteLine("\t\t|||                                                        |||");
-            Console.WriteLine("\t\t|||  Enter the password of the X509 certificate            |||");
-            Console.WriteLine("\t\t|||                                                        |||");
-            Console.WriteLine("\t\t|||  [ E ] Exit the configuration                          |||");
-            Console.WriteLine("\t\t|||                                                        |||");
-            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-
-
-            Console.Write("\n\n\t\t\t      [ - ] Input: ");
-
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-
-
-        public static void X509_Certificate_Setup_Successful()
-        {
-            Console.Clear();
-
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-            Console.WriteLine("\t\t|||                    X509 CERTIFICATE                    |||");
-            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-            Console.WriteLine("\t\t|||                                                        |||");
-            Console.WriteLine("\t\t|||  X509 setup successful                                 |||");
-            Console.WriteLine("\t\t|||                                                        |||");
-            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
-            Console.WriteLine("\t\t|||                                                        |||");
-            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-
-
-            Console.Write("\n\n\t\t\t      [ - ] Input: ");
-
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-
-
-        public static void X509_Certificate_Setup_Error()
-        {
-            Console.Clear();
-
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-            Console.WriteLine("\t\t|||                    X509 CERTIFICATE                    |||");
-            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-            Console.WriteLine("\t\t|||                                                        |||");
-            Console.WriteLine("\t\t|||  X509 setup unsuccessful. Either the password provided |||");
-            Console.WriteLine("\t\t|||  is not valid or the certificate is invalid.           |||");
-            Console.WriteLine("\t\t|||                                                        |||");
-            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
-            Console.WriteLine("\t\t|||                                                        |||");
-            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-
-
-            Console.Write("\n\n\t\t\t      [ - ] Input: ");
-
-            Console.ForegroundColor = ConsoleColor.White;
-        }
-
-
-        public static void X509_Certificate_Setup_Cancelled()
-        {
-            Console.Clear();
-
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-            Console.WriteLine("\t\t|||                    X509 CERTIFICATE                    |||");
-            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-            Console.WriteLine("\t\t|||                                                        |||");
-            Console.WriteLine("\t\t|||  X509 setup cancelled                                  |||");
-            Console.WriteLine("\t\t|||                                                        |||");
-            Console.WriteLine("\t\t|||  [ X ] Press any key                                   |||");
-            Console.WriteLine("\t\t|||                                                        |||");
-            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\n\n\n\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                           X509 CERTIFICATE                         |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            Console.WriteLine("\t\t|||                                                                    |||");
+            Console.WriteLine("\t\t|||  X509 SSL certificate loadup unsuccessful.                         |||");
+            Console.WriteLine("\t\t|||                                                                    |||");
+            Console.WriteLine("\t\t|||  Either the ssl certificate is not valid, or it does not exist,    |||");
+            Console.WriteLine("\t\t|||  or the password set for the certificate is not valid. If a        |||");
+            Console.WriteLine("\t\t|||  certificate already exists in the server application's directory  |||");
+            Console.WriteLine("\t\t|||  delete it, go to the settings menu and select the option          |||");
+            Console.WriteLine("\t\t|||  [ Generate a x509(SSL) certificate ]. After the certificate is    |||");
+            Console.WriteLine("\t\t|||  generated, give this certificate and its password to all          |||");
+            Console.WriteLine("\t\t|||  Omega Drive clients that will connect to this server              |||");
+            Console.WriteLine("\t\t|||  application to install this certificate on their machines.        |||");
+            Console.WriteLine("\t\t|||  This is required in order for both the client and server to       |||");
+            Console.WriteLine("\t\t|||  communicate securely.                                             |||");
+            Console.WriteLine("\t\t|||                                                                    |||");
+            Console.WriteLine("\t\t|||  [ X ] Press any key                                               |||");
+            Console.WriteLine("\t\t|||                                                                    |||");
+            Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
 
 
             Console.Write("\n\n\t\t\t      [ - ] Input: ");

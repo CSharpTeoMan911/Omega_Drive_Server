@@ -24,8 +24,37 @@ namespace Omega_Drive_Server
 
 
         private static async Task<bool> Application_Main_Thread()
-        { 
+        {
+            
             await Load_Server_Application_Settings_File();
+
+
+        x509_Certificate_Generation:
+
+            bool server_certificate_load_up_successful = await server_cryptographic_functions.Load_Server_Certificate_In_Application_Memory();
+
+            if (server_certificate_load_up_successful == false)
+            {
+
+                Server_Application_GUI.X509_Certificate_Loadup_Error();
+                Console.ReadLine();
+
+                bool x509_Certificate_Generation_Result_Is_Successful = await Generate_X509_Certificate();
+
+                if (x509_Certificate_Generation_Result_Is_Successful == true)
+                {
+                    Server_Application_GUI.X509_Certificate_Generation_Successful();
+                }
+                else
+                {
+                    Server_Application_GUI.X509_Certificate_Generation_Unsuccessful();
+                }
+
+                Console.ReadLine();
+
+                goto x509_Certificate_Generation;
+            }
+            
 
 
             server_functionality_timer = new System.Timers.Timer();
@@ -93,7 +122,7 @@ namespace Omega_Drive_Server
                 {
                     bool Server_Port_Setup_Cancelled = await Server_Port_Number_Setup();
 
-                    if(Server_Port_Setup_Cancelled == true)
+                    if (Server_Port_Setup_Cancelled == true)
                     {
                         Server_Application_GUI.Port_Setup_Cancelled();
                     }
@@ -136,7 +165,7 @@ namespace Omega_Drive_Server
                 {
                     bool Cloudmersive_Setup_Cancelled = await Set_Cloudmersive_Scan_API_Key();
 
-                    if(Cloudmersive_Setup_Cancelled == true)
+                    if (Cloudmersive_Setup_Cancelled == true)
                     {
                         Server_Application_GUI.Cloudmersive_API_Key_Setup_Cancelled();
                     }
@@ -178,25 +207,6 @@ namespace Omega_Drive_Server
                     else
                     {
                         Server_Application_GUI.X509_Certificate_Generation_Unsuccessful();
-                    }
-
-                    Console.ReadLine();
-
-                    goto Settings_Menu;
-                }
-                else if (settings_input == "SC")
-                {
-                    bool x509_Certificate_Setup_Result_Is_Cancelled = await Set_X509_Certificate();
-
-                    if (x509_Certificate_Setup_Result_Is_Cancelled == true)
-                    {
-                        Server_Application_GUI.X509_Certificate_Setup_Cancelled();
-                        Console.ReadLine();
-                    }
-                    else
-                    {
-                        Server_Application_GUI.X509_Certificate_Setup_Successful();
-                        Console.ReadLine();
                     }
 
                     Console.ReadLine();
@@ -592,67 +602,53 @@ namespace Omega_Drive_Server
             Server_Application_GUI.X509_Certificate_Generation_Password_Setup();
             string certificate_password = Console.ReadLine();
 
-        Time_Period_Setup:
-            int certificate_valid_time_period = 0;
-            Server_Application_GUI.X509_Certificate_Generation_Valid_Time_Period_Setup();
-
-            try
-            {
-                certificate_valid_time_period = (int)Convert.ToDouble(Console.ReadLine());
-            }
-            catch
-            {
-                goto Time_Period_Setup;
-            }
-
-
-            x509_Certificate_Generation_Result_Is_Successful = await server_cryptographic_functions.Create_X509_Server_Certificate(certificate_password, certificate_valid_time_period);
-
-            if(x509_Certificate_Generation_Result_Is_Successful == false)
-            {
-                await Generate_X509_Certificate();
-            }
-
-            return true;
-        }
-
-
-
-        private static async Task<bool> Set_X509_Certificate()
-        {
-            bool X509_Certificate_Cancelled = false;
-
-            Server_Application_GUI.X509_Certificate_Setup();
-
-            string certificate_password = Console.ReadLine();
-
             if(certificate_password != "E")
             {
-                bool X509_Certificate_Setup_Result = await server_cryptographic_functions.Load_Server_Certificate_In_Application_Memory(certificate_password);
+            Time_Period_Setup:
+                int certificate_valid_time_period = 0;
+                Server_Application_GUI.X509_Certificate_Generation_Valid_Time_Period_Setup();
+                string time_period = Console.ReadLine();
 
-                if(X509_Certificate_Setup_Result == false)
+
+                if(time_period != "E")
                 {
-                    Server_Application_GUI.X509_Certificate_Setup_Error();
-                    Console.ReadLine();
+                    try
+                    {
+                        certificate_valid_time_period = (int)Convert.ToDouble(time_period);
+                    }
+                    catch
+                    {
+                        goto Time_Period_Setup;
+                    }
 
-                    await Set_X509_Certificate();
+
+                    x509_Certificate_Generation_Result_Is_Successful = await server_cryptographic_functions.Create_X509_Server_Certificate(certificate_password, certificate_valid_time_period);
+
+                    if (x509_Certificate_Generation_Result_Is_Successful == false)
+                    {
+                        await Generate_X509_Certificate();
+                    }
+                    else
+                    {
+                        lock (server_ssl_certificate_password)
+                        {
+                            server_ssl_certificate_password = certificate_password;
+                        }
+
+                        await Update_Server_Application_Settings_File();
+                    }
                 }
                 else
                 {
-                    lock(server_ssl_certificate_password)
-                    {
-                        server_ssl_certificate_password = certificate_password;
-                    }
-
-                    await Update_Server_Application_Settings_File();
+                    x509_Certificate_Generation_Result_Is_Successful = false;
                 }
             }
             else
             {
-                X509_Certificate_Cancelled = true;
+                x509_Certificate_Generation_Result_Is_Successful = false;
             }
 
-            return X509_Certificate_Cancelled;
+            return x509_Certificate_Generation_Result_Is_Successful;
         }
 
     }
