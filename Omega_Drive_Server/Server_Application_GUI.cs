@@ -9,7 +9,7 @@ namespace Omega_Drive_Server
 {
     class Server_Application_GUI:Server_Application_Variables
     {
-        public static async void Main_Menu()
+        internal static async void Main_Menu()
         {
             Console.Clear();
 
@@ -50,8 +50,8 @@ namespace Omega_Drive_Server
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        
-        public static void Settings_Menu()
+
+        internal static void Settings_Menu()
         {
             Console.Clear();
 
@@ -110,7 +110,7 @@ namespace Omega_Drive_Server
         /// </summary>
 
 
-        public static void Port_Setup()
+        internal static void Port_Setup()
         {
             Console.Clear();
 
@@ -132,7 +132,7 @@ namespace Omega_Drive_Server
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        public static void Port_Setup_Successful()
+        internal static void Port_Setup_Successful()
         {
             Console.Clear();
 
@@ -153,7 +153,7 @@ namespace Omega_Drive_Server
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        public static void Port_Setup_Cancelled()
+        internal static void Port_Setup_Cancelled()
         {
             Console.Clear();
 
@@ -189,7 +189,7 @@ namespace Omega_Drive_Server
         /// </summary>
 
 
-        public static void SSL_Protocol_Setup()
+        internal static void SSL_Protocol_Setup()
         {
             Console.Clear();
 
@@ -216,7 +216,7 @@ namespace Omega_Drive_Server
 
 
 
-        public static void SSL_Protocol_Setup_Finsished()
+        internal static void SSL_Protocol_Setup_Finsished()
         {
             Console.Clear();
 
@@ -261,7 +261,7 @@ namespace Omega_Drive_Server
 
 
 
-        public static void SMTPS_Service_Email_Setup()
+        internal static void SMTPS_Service_Email_Setup()
         {
             Console.Clear();
 
@@ -280,7 +280,7 @@ namespace Omega_Drive_Server
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        public static void SMTPS_Service_Password_Setup()
+        internal static void SMTPS_Service_Password_Setup()
         {
             Console.Clear();
 
@@ -299,7 +299,7 @@ namespace Omega_Drive_Server
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        public static void SMTPS_Service_Provider_Setup()
+        internal static void SMTPS_Service_Provider_Setup()
         {
             Console.Clear();
 
@@ -322,7 +322,7 @@ namespace Omega_Drive_Server
 
 
 
-        public static void SMTPS_Error_Message()
+        internal static void SMTPS_Error_Message()
         {
             Console.Clear();
 
@@ -345,7 +345,7 @@ namespace Omega_Drive_Server
         }
 
 
-        public static void SMTPS_Service_Provider_Setup_Successful()
+        internal static void SMTPS_Service_Provider_Setup_Successful()
         {
             Console.Clear();
 
@@ -366,7 +366,7 @@ namespace Omega_Drive_Server
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        public static void SMTPS_Service_Provider_Setup_Cancelled()
+        internal static void SMTPS_Service_Provider_Setup_Cancelled()
         {
             Console.Clear();
 
@@ -406,7 +406,7 @@ namespace Omega_Drive_Server
         /// 
         /// </summary>
 
-        public static void Cloudmersive_API_Key_Setup()
+        internal static void Cloudmersive_API_Key_Setup()
         {
             Console.Clear();
 
@@ -430,7 +430,7 @@ namespace Omega_Drive_Server
         }
 
 
-        public static void Cloudmersive_API_Key_Setup_Error_Message()
+        internal static void Cloudmersive_API_Key_Setup_Error_Message()
         {
             Console.Clear();
 
@@ -453,7 +453,7 @@ namespace Omega_Drive_Server
         }
 
 
-        public static void Cloudmersive_API_Key_Setup_Successful()
+        internal static void Cloudmersive_API_Key_Setup_Successful()
         {
             Console.Clear();
 
@@ -475,7 +475,7 @@ namespace Omega_Drive_Server
         }
 
 
-        public static void Cloudmersive_API_Key_Setup_Cancelled()
+        internal static void Cloudmersive_API_Key_Setup_Cancelled()
         {
             Console.Clear();
 
@@ -497,7 +497,7 @@ namespace Omega_Drive_Server
         }
 
 
-        public static void Cloudmersive_API_Disabled()
+        internal static void Cloudmersive_API_Disabled()
         {
             Console.Clear();
 
@@ -533,7 +533,7 @@ namespace Omega_Drive_Server
         /// 
         /// </summary>
 
-        public static void MySQL_Username_Setup()
+        internal static void MySQL_Username_Setup()
         {
             Console.Clear();
 
@@ -555,7 +555,7 @@ namespace Omega_Drive_Server
         }
 
 
-        public static void MySQL_Password_Setup()
+        internal static void MySQL_Password_Setup()
         {
             Console.Clear();
 
@@ -576,7 +576,7 @@ namespace Omega_Drive_Server
         }
 
 
-        public static void MySQL_Server_Setup()
+        internal static void MySQL_Server_Setup()
         {
             Console.Clear();
 
@@ -599,7 +599,7 @@ namespace Omega_Drive_Server
 
 
 
-        public static void MySQL_Server_Authentification_Error()
+        internal static void MySQL_Server_Authentification_Error()
         {
             Console.Clear();
 
@@ -621,7 +621,7 @@ namespace Omega_Drive_Server
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        public static void MySQL_Server_Authentification_Successful()
+        internal static void MySQL_Server_Authentification_Successful()
         {
             Console.Clear();
 
@@ -657,7 +657,7 @@ namespace Omega_Drive_Server
         /// 
         /// </summary>
 
-        public static void X509_Certificate_Generation_Password_Setup()
+        internal static void X509_Certificate_Generation_Password_Setup()
         {
             Console.Clear();
 
@@ -677,7 +677,7 @@ namespace Omega_Drive_Server
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        public static void X509_Certificate_Generation_Valid_Time_Period_Setup()
+        internal static void X509_Certificate_Generation_Valid_Time_Period_Setup()
         {
             Console.Clear();
 
@@ -698,7 +698,7 @@ namespace Omega_Drive_Server
         }
 
 
-        public static void X509_Certificate_Generation_Successful()
+        internal static void X509_Certificate_Generation_Successful()
         {
             Console.Clear();
 
@@ -721,7 +721,7 @@ namespace Omega_Drive_Server
         }
 
 
-        public static void X509_Certificate_Generation_Unsuccessful()
+        internal static void X509_Certificate_Generation_Unsuccessful()
         {
             Console.Clear();
 
@@ -753,7 +753,7 @@ namespace Omega_Drive_Server
         /// 
         /// </summary>
 
-        public static void X509_Certificate_Loadup_Error()
+        internal static void X509_Certificate_Loadup_Error()
         {
             Console.Clear();
 

@@ -16,6 +16,9 @@ namespace Omega_Drive_Server
         private byte[] server_response = Encoding.UTF8.GetBytes("OK");
         private byte[] client_response = new byte[Encoding.UTF8.GetBytes("OK").Length];
 
+
+        private Server_Function_Selector server_function_selector = new Server_Function_Selector();
+
         internal async Task<bool> Secure_Client_Connection(System.Net.Sockets.Socket client)
         {
             try
@@ -72,8 +75,6 @@ namespace Omega_Drive_Server
 
                             int total_bytes_read = 0;
 
-                            total_bytes_read += await client_secure_socket_layer_stream.ReadAsync(client_payload_buffer, total_bytes_read, client_payload_buffer.Length - total_bytes_read);
-
                             while (total_bytes_read < client_payload_buffer.Length)
                             {
                                 total_bytes_read += await client_secure_socket_layer_stream.ReadAsync(client_payload_buffer, total_bytes_read, client_payload_buffer.Length - total_bytes_read);
@@ -86,37 +87,11 @@ namespace Omega_Drive_Server
 
 
 
-                            byte[] server_payload = new byte[1024];
-
                             Payload_Serialization payload_Serialization = new Payload_Serialization();
                             Client_WSDL_Payload client_WSDL_Payload = await payload_Serialization.Deserialize_Payload(client_payload_buffer);
 
-                            
-                            switch(client_WSDL_Payload.Function)
-                            {
-                                case "Log in":
+                            byte[] server_payload = await server_function_selector.Server_Function_Selection(client_WSDL_Payload);
 
-                                    byte[] file = Encoding.UTF8.GetBytes(client_WSDL_Payload.Password___Or___Binary_Content);
-                                    byte[] file2 = System.IO.File.ReadAllBytes("Test_Image.jpg");
-
-                                    if (Encoding.UTF8.GetString(file) == Encoding.UTF8.GetString(file2))
-                                    {
-                                        System.IO.MemoryStream ms = new System.IO.MemoryStream(file);
-
-                                        System.IO.FileStream fs = new System.IO.FileStream("Test_Image_Received.jpg", System.IO.FileMode.Create, System.IO.FileAccess.ReadWrite);
-
-                                        ms.WriteTo(fs);
-                                        await ms.FlushAsync();
-                                        await fs.FlushAsync();
-
-                                        await ms.DisposeAsync();
-                                        await fs.DisposeAsync();
-                                    }
-
-
-                                    server_payload = await payload_Serialization.Serialize_Payload(System.IO.File.ReadAllBytes("Test_Image.jpg"));
-                                    break;
-                            }
 
 
 

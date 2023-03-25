@@ -8,7 +8,7 @@ namespace Omega_Drive_Server
 {
     internal class Payload_Serialization
     {
-        public async Task<byte[]> Serialize_Payload(byte[] payload)
+        internal async Task<byte[]> Serialize_Payload(byte[] payload)
         {
             byte[] serialized_payload = new byte[1024];
 
@@ -18,7 +18,7 @@ namespace Omega_Drive_Server
             try
             {
                 Server_WSDL_Payload server_WSDL_Payload = new Server_WSDL_Payload();
-                server_WSDL_Payload.Server_Payload = Convert.ToBase64String(payload);
+                server_WSDL_Payload.Server_Payload = payload;
 
 
 
@@ -55,7 +55,7 @@ namespace Omega_Drive_Server
 
 
 
-        public Task<Client_WSDL_Payload> Deserialize_Payload(byte[] payload)
+        internal Task<Client_WSDL_Payload> Deserialize_Payload(byte[] payload)
         {
             Client_WSDL_Payload client_WSDL_Payload = new Client_WSDL_Payload();
 
@@ -69,7 +69,6 @@ namespace Omega_Drive_Server
 
                 client_WSDL_Payload.Function = Encoding.UTF8.GetString(Convert.FromBase64String(client_WSDL_Payload.Function));
                 client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key = Encoding.UTF8.GetString(Convert.FromBase64String(client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key));
-                client_WSDL_Payload.Password___Or___Binary_Content = Encoding.UTF8.GetString(Convert.FromBase64String(client_WSDL_Payload.Password___Or___Binary_Content));
             }
             catch (Exception E)
             {

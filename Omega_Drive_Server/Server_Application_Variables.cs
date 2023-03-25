@@ -49,7 +49,7 @@ namespace Omega_Drive_Server
 
 
 
-        protected static Task<bool> SSSL_Protocol_Selection()
+        protected static Task<bool> SSL_Protocol_Selection()
         {
             switch (available_connection_ssl_protocol[current_connection_ssl_protocol])
             {
@@ -131,7 +131,7 @@ namespace Omega_Drive_Server
                 }
             }
 
-            await SSSL_Protocol_Selection();
+            await SSL_Protocol_Selection();
 
 
             byte[] json_serialised_server_application_settings = Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(settings, Newtonsoft.Json.Formatting.Indented));
@@ -217,7 +217,7 @@ namespace Omega_Drive_Server
                         }
                     }
 
-                    await SSSL_Protocol_Selection();
+                    await SSL_Protocol_Selection();
 
 
                     server_settings_load_is_successful = true;
