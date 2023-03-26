@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Security;
 using System.Threading.Tasks;
 using Cloudmersive.APIClient.NETCore.VirusScan.Api;
 using Cloudmersive.APIClient.NETCore.VirusScan.Client;
@@ -9,7 +10,8 @@ namespace Omega_Drive_Server
 {
     class Server_Cryptographic_Functions:Server_Application_Variables
     {
-        private static string server_certificate_name = "Omega_Drive.crt";
+        private static string client_certificate_name = "Client_Omega_Drive.crt";
+        private static string server_certificate_name = "Server_Omega_Drive.crt";
 
 
         internal async Task<bool> Create_X509_Server_Certificate(string password, int certificate_valid_time_period_in_days)
@@ -92,27 +94,63 @@ namespace Omega_Drive_Server
                     await certificate_memory_stream.FlushAsync();
 
 
-                    System.IO.FileStream certificate_file_stream = System.IO.File.Create(server_certificate_name, (int)certificate_memory_stream.Length, System.IO.FileOptions.Asynchronous);
+
+
+
+                    System.Security.Cryptography.X509Certificates.X509Certificate2 client_certificate = new System.Security.Cryptography.X509Certificates.X509Certificate2(certificate_memory_stream.ToArray(), password.ToCharArray());
+                    byte[] client_certificate_binary_data = client_certificate.Export(System.Security.Cryptography.X509Certificates.X509ContentType.Cert, new string(password.ToCharArray()));
+
+
+
+
+
+
+                    System.IO.FileStream server_certificate_file_stream = System.IO.File.Create(server_certificate_name, (int)certificate_memory_stream.Length, System.IO.FileOptions.Asynchronous);
                     try
                     {
-                        await certificate_file_stream.WriteAsync(certificate_memory_stream.ToArray());
-                        await certificate_file_stream.FlushAsync();
+                        await server_certificate_file_stream.WriteAsync(certificate_memory_stream.ToArray());
+                        await server_certificate_file_stream.FlushAsync();
                     }
                     catch
                     {
-                        if (certificate_file_stream != null)
+                        if (server_certificate_file_stream != null)
                         {
-                            await certificate_file_stream.FlushAsync();
-                            certificate_file_stream.Close();
+                            await server_certificate_file_stream.FlushAsync();
+                            server_certificate_file_stream.Close();
                         }
                     }
                     finally
                     {
-                        if (certificate_file_stream != null)
+                        if (server_certificate_file_stream != null)
                         {
-                            await certificate_file_stream.FlushAsync();
-                            certificate_file_stream.Close();
-                            await certificate_file_stream.DisposeAsync();
+                            await server_certificate_file_stream.FlushAsync();
+                            server_certificate_file_stream.Close();
+                            await server_certificate_file_stream.DisposeAsync();
+                        }
+                    }
+
+
+                    System.IO.FileStream client_certificate_file_stream = System.IO.File.Create(client_certificate_name, client_certificate_binary_data.Length, System.IO.FileOptions.Asynchronous);
+                    try
+                    {
+                        await client_certificate_file_stream.WriteAsync(client_certificate_binary_data);
+                        await client_certificate_file_stream.FlushAsync();
+                    }
+                    catch
+                    {
+                        if (client_certificate_file_stream != null)
+                        {
+                            await client_certificate_file_stream.FlushAsync();
+                            client_certificate_file_stream.Close();
+                        }
+                    }
+                    finally
+                    {
+                        if (client_certificate_file_stream != null)
+                        {
+                            await client_certificate_file_stream.FlushAsync();
+                            client_certificate_file_stream.Close();
+                            await client_certificate_file_stream.DisposeAsync();
                         }
                     }
                 }

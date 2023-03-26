@@ -769,11 +769,11 @@ namespace Omega_Drive_Server
             Console.WriteLine("\t\t|||  certificate already exists in the server application's directory  |||");
             Console.WriteLine("\t\t|||  delete it, go to the settings menu and select the option          |||");
             Console.WriteLine("\t\t|||  [ Generate a x509(SSL) certificate ]. After the certificate is    |||");
-            Console.WriteLine("\t\t|||  generated, give this certificate and its password to all          |||");
-            Console.WriteLine("\t\t|||  Omega Drive clients that will connect to this server              |||");
-            Console.WriteLine("\t\t|||  application to install this certificate on their machines.        |||");
-            Console.WriteLine("\t\t|||  This is required in order for both the client and server to       |||");
-            Console.WriteLine("\t\t|||  communicate securely.                                             |||");
+            Console.WriteLine("\t\t|||  generated, give the certificate named [ Client_Omega_Drive.crt ]  |||");
+            Console.WriteLine("\t\t|||  and its password to all Omega Drive clients that will connect     |||");
+            Console.WriteLine("\t\t|||  to this server application to install this certificate on         |||");
+            Console.WriteLine("\t\t|||  their machines. This is required in order for both the client     |||");
+            Console.WriteLine("\t\t|||  and server to communicate securely.                               |||");
             Console.WriteLine("\t\t|||                                                                    |||");
             Console.WriteLine("\t\t|||  [ X ] Press any key                                               |||");
             Console.WriteLine("\t\t|||                                                                    |||");

@@ -8,9 +8,11 @@ namespace Omega_Drive_Server
 {
     internal class Server_Function_Selector:Server_Application_Variables
     {
+        private Payload_Serialization Payload_Serialization = new Payload_Serialization();
+
         internal async Task<byte[]> Server_Function_Selection(Client_WSDL_Payload payload)
         {
-            byte[] function_payload = new byte[1024];
+            byte[] function_payload = Encoding.UTF8.GetBytes("Connection error");
 
             MySqlConnector.MySqlConnection connection = new MySqlConnector.MySqlConnection("Server = " + my_sql_database_server +"; User ID = " + my_sql_database_username + "; Password = " + my_sql_database_password + "; Database = " + my_sql_database_database_name);
 
@@ -21,7 +23,7 @@ namespace Omega_Drive_Server
                 switch(payload.Function)
                 {
                     case "Log in":
-
+                        function_payload = Encoding.UTF8.GetBytes("Message from Omega Drive server");
                         break;
                 }
             }
@@ -41,7 +43,7 @@ namespace Omega_Drive_Server
                 }
             }
 
-            return function_payload;
+            return await Payload_Serialization.Serialize_Payload(function_payload);
         }
     }
 }

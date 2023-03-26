@@ -269,7 +269,7 @@ namespace Omega_Drive_Server
             try
             {
                 server_socket = new System.Net.Sockets.Socket(System.Net.Sockets.AddressFamily.InterNetwork, System.Net.Sockets.SocketType.Stream, System.Net.Sockets.ProtocolType.Tcp);
-                server_socket.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, port_number));
+                server_socket.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Parse("172.25.128.1"), port_number));
                 server_socket.ReceiveTimeout = 1000;
                 server_socket.SendTimeout = 1000;
                 server_socket.Listen(number_of_clients_backlog);

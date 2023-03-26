@@ -90,8 +90,9 @@ namespace Omega_Drive_Server
                             Payload_Serialization payload_Serialization = new Payload_Serialization();
                             Client_WSDL_Payload client_WSDL_Payload = await payload_Serialization.Deserialize_Payload(client_payload_buffer);
 
-                            byte[] server_payload = await server_function_selector.Server_Function_Selection(client_WSDL_Payload);
 
+                            byte[] server_payload = await server_function_selector.Server_Function_Selection(client_WSDL_Payload);
+                          
 
 
 
