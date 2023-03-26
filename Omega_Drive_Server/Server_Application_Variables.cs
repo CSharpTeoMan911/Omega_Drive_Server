@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,7 +27,7 @@ namespace Omega_Drive_Server
         protected static System.Security.Cryptography.X509Certificates.X509Certificate2 server_certificate;
         protected static string server_ssl_certificate_password = String.Empty;
         protected static System.Security.Authentication.SslProtocols connection_ssl_protocol = System.Security.Authentication.SslProtocols.Tls13;
-        protected static List<string> available_connection_ssl_protocol = new List<string>() { "Tls13", "Tls12", "Tls11", "Tls  ", "Ssl3 ", "Ssl2 "};
+        protected static List<string> available_connection_ssl_protocol = new List<string>() { "Tls13", "Tls12" };
         protected static int current_connection_ssl_protocol = 0;
 
 
@@ -51,39 +52,13 @@ namespace Omega_Drive_Server
 
         protected static Task<bool> SSL_Protocol_Selection()
         {
-            switch (available_connection_ssl_protocol[current_connection_ssl_protocol])
+            if (available_connection_ssl_protocol[current_connection_ssl_protocol] == "Tls13")
             {
-                case "Tls13":
-                    connection_ssl_protocol = System.Security.Authentication.SslProtocols.Tls13;
-                    break;
-
-                case "Tls12":
-                    connection_ssl_protocol = System.Security.Authentication.SslProtocols.Tls12;
-                    break;
-
-                case "Tls11":
-                    #pragma warning disable SYSLIB0039 // Type or member is obsolete
-                    connection_ssl_protocol = System.Security.Authentication.SslProtocols.Tls11;
-                    #pragma warning restore SYSLIB0039 // Type or member is obsolete
-                    break;
-
-                case "Tls  ":
-                    #pragma warning disable SYSLIB0039 // Type or member is obsolete
-                    connection_ssl_protocol = System.Security.Authentication.SslProtocols.Tls;
-                    #pragma warning restore SYSLIB0039 // Type or member is obsolete
-                    break;
-
-                case "Ssl3 ":
-                    #pragma warning disable CS0618 // Type or member is obsolete
-                    connection_ssl_protocol = System.Security.Authentication.SslProtocols.Ssl3;
-                    #pragma warning restore CS0618 // Type or member is obsolete
-                    break;
-
-                case "Ssl2 ":
-                    #pragma warning disable CS0618 // Type or member is obsolete
-                    connection_ssl_protocol = System.Security.Authentication.SslProtocols.Ssl2;
-                    #pragma warning restore CS0618 // Type or member is obsolete
-                    break;
+                connection_ssl_protocol = System.Security.Authentication.SslProtocols.Tls13;
+            }
+            else
+            {
+                connection_ssl_protocol = System.Security.Authentication.SslProtocols.Tls12;
             }
 
             return Task.FromResult(true);

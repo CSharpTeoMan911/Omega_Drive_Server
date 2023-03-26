@@ -325,12 +325,9 @@ namespace Omega_Drive_Server
 
             if(input == "N")
             {
-                lock (available_connection_ssl_protocol)
+                if (current_connection_ssl_protocol < 1)
                 {
-                    if (current_connection_ssl_protocol < available_connection_ssl_protocol.Count)
-                    {
-                        current_connection_ssl_protocol++;
-                    }
+                    current_connection_ssl_protocol++;
                 }
 
                 await Update_Server_Application_Settings_File();
