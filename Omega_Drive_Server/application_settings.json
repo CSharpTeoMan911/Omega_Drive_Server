@@ -1,0 +1,12 @@
+{
+  "port_number": 1024,
+  "ssl_protocol_index": 0,
+  "ssl_certificate_password": "T21lZ2E=",
+  "smtps_service_provider": "Google",
+  "smtps_sevice_email": "",
+  "smtps_service_password": "",
+  "cloudmersive_api_key": "",
+  "my_sql_username": "",
+  "my_sql_password": "",
+  "my_sql_server": ""
+}
