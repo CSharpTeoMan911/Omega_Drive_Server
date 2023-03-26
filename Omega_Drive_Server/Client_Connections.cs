@@ -26,9 +26,28 @@ namespace Omega_Drive_Server
                 client.SendBufferSize = 18000;
                 client.ReceiveBufferSize = 18000;
 
+
                 await Connection_Speed_Calculator(((IPEndPoint)client.RemoteEndPoint).Address);
 
-                if(current_connection_speed > 0)
+
+
+
+
+                //  !!!!!!!!!!!!!!!!! REPLACE THE PING IMPLEMENTATION !!!!!!!!!!!!!!!!!!
+                //
+                //
+                //   DO A CONNECTION SPEED ANALYSIS USING THE ROUND TRIP TIME COLLECTED
+                //   FROM EXCHANGING MESSAGES ON THE CONNECTION STREAM, NOT USING PING.
+                //
+                //
+                //  !!!!!!!!!!!!!!!!! REPLACE THE PING IMPLEMENTATION !!!!!!!!!!!!!!!!!!
+
+
+
+
+
+
+                if (current_connection_speed > 0)
                 {
                     client.SendTimeout = 1000;
                     client.ReceiveTimeout = 1000;
