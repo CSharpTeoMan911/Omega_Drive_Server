@@ -19,7 +19,13 @@ namespace Omega_Drive_Server
             // [ Main ] thread to wait for a return value that the Task<bool> Application_Main_Thread ]
             // must give at the end of its execution, which is set to happen when the program is
             // scheduled for exit.
-            bool return_value = Application_Main_Thread().Result;
+            try{
+bool return_value = Application_Main_Thread().Result;
+            }
+            catch(Exception E)
+            {
+                System.Diagnostics.Debug.WriteLine(E.Message);
+            }
         }
 
 
@@ -98,12 +104,13 @@ namespace Omega_Drive_Server
 
                     if (server_socket != null)
                     {
-                        if (server_socket.Connected == true)
+                        try
                         {
                             server_socket.Shutdown(System.Net.Sockets.SocketShutdown.Both);
+                            server_socket.Close();
+                            server_socket.Dispose();
                         }
-                        server_socket.Close();
-                        server_socket.Dispose();
+                        catch{}
                     }
 
                     goto Main_Menu;
