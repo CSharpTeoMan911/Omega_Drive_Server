@@ -108,10 +108,14 @@ bool return_value = Application_Main_Thread().Result;
                 {
                     server_opened = false;
 
-                    if(server_socket.Connected == true)
+                    if (server_socket != null)
                     {
-
-                        await server_socket.DisconnectAsync(true, System.Threading.CancellationToken.None);
+                        if (server_socket.Connected == true)
+                        {
+                            server_socket.Shutdown(System.Net.Sockets.SocketShutdown.Both);
+                        }
+                        server_socket.Close();
+                        server_socket.Dispose();
                     }
 
                     goto Main_Menu;
