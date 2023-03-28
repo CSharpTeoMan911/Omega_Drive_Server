@@ -10,6 +10,8 @@ namespace Omega_Drive_Server
         private static Client_Connections client_connections = new Client_Connections();
         private static Server_Cryptographic_Functions server_cryptographic_functions = new Server_Cryptographic_Functions();
 
+        private static System.Threading.Thread server_socket_thread;
+
 
 
         static void Main(string[] args)
@@ -25,7 +27,11 @@ namespace Omega_Drive_Server
 
         private static async Task<bool> Application_Main_Thread()
         {
-            
+            server_socket = new System.Net.Sockets.Socket(System.Net.Sockets.AddressFamily.InterNetwork, System.Net.Sockets.SocketType.Stream, System.Net.Sockets.ProtocolType.Tcp);
+            server_socket.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, port_number));
+            server_socket.ReceiveTimeout = 1000;
+            server_socket.SendTimeout = 1000;
+
             await Load_Server_Application_Settings_File();
 
 
@@ -96,14 +102,9 @@ namespace Omega_Drive_Server
                 {
                     server_opened = false;
 
-                    if (server_socket != null)
+                    if(server_socket.Connected == true)
                     {
-                        if (server_socket.Connected == true)
-                        {
-                            server_socket.Shutdown(System.Net.Sockets.SocketShutdown.Both);
-                        }
-                        server_socket.Close();
-                        server_socket.Dispose();
+                        await server_socket.DisconnectAsync(true, System.Threading.CancellationToken.None);
                     }
 
                     goto Main_Menu;
@@ -235,6 +236,8 @@ namespace Omega_Drive_Server
             return true;
         }
 
+
+
         private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
             if(server_certificate != null)
@@ -268,20 +271,25 @@ namespace Omega_Drive_Server
         {
             try
             {
-                server_socket = new System.Net.Sockets.Socket(System.Net.Sockets.AddressFamily.InterNetwork, System.Net.Sockets.SocketType.Stream, System.Net.Sockets.ProtocolType.Tcp);
-                server_socket.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, port_number));
-                server_socket.ReceiveTimeout = 1000;
-                server_socket.SendTimeout = 1000;
                 server_socket.Listen(number_of_clients_backlog);
 
-                while (server_opened == true)
+                while (true)
                 {
-                    await client_connections.Secure_Client_Connection(server_socket.Accept());
+                    System.Net.Sockets.Socket client = server_socket.Accept();
+
+                    if(server_opened == true)
+                    {
+                        await client_connections.Secure_Client_Connection(client);
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
             catch(Exception E) 
             {
-                
+                System.Diagnostics.Debug.WriteLine(E.Message);
             }
         }
 
