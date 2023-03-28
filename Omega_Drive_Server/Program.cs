@@ -21,8 +21,9 @@ namespace Omega_Drive_Server
             // [ Main ] thread to wait for a return value that the Task<bool> Application_Main_Thread ]
             // must give at the end of its execution, which is set to happen when the program is
             // scheduled for exit.
-            try{
-bool return_value = Application_Main_Thread().Result;
+            try
+            {
+                bool return_value = Application_Main_Thread().Result;
             }
             catch(Exception E)
             {
@@ -50,7 +51,7 @@ bool return_value = Application_Main_Thread().Result;
 
                 Server_Application_GUI.X509_Certificate_Loadup_Error();
                 Console.ReadLine();
-
+                  
                 bool x509_Certificate_Generation_Result_Is_Successful = await Generate_X509_Certificate();
 
                 if (x509_Certificate_Generation_Result_Is_Successful == true)
@@ -108,14 +109,9 @@ bool return_value = Application_Main_Thread().Result;
                 {
                     server_opened = false;
 
-                    if (server_socket != null)
+                    if(server_socket.Connected == true)
                     {
-                        if (server_socket.Connected == true)
-                        {
-                            server_socket.Shutdown(System.Net.Sockets.SocketShutdown.Both);
-                        }
-                        server_socket.Close();
-                        server_socket.Dispose();
+                        await server_socket.DisconnectAsync(true, System.Threading.CancellationToken.None);
                     }
 
                     goto Main_Menu;
