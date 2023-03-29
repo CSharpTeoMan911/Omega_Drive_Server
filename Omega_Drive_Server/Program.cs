@@ -574,7 +574,7 @@ namespace Omega_Drive_Server
 
                             await Update_Server_Application_Settings_File();
                         }
-                        catch
+                        catch(Exception E)
                         {
                             Server_Application_GUI.MySQL_Server_Authentification_Error();
                             Console.ReadLine();
