@@ -9,6 +9,8 @@ namespace Omega_Drive_Server
     internal class Server_Function_Selector:Server_Application_Variables
     {
         private Payload_Serialization Payload_Serialization = new Payload_Serialization();
+        private Authentification_Functions Authentification_Functions = new Authentification_Functions();
+
 
         internal async Task<byte[]> Server_Function_Selection(Client_WSDL_Payload payload)
         {
@@ -23,8 +25,18 @@ namespace Omega_Drive_Server
                 await connection.OpenAsync();
                 switch(payload.Function)
                 {
+                    case "Register":
+                        function_payload = await Authentification_Functions.Register_Account(connection, payload);
+                        break;
+
+                    case "Account validation":
+                        break;
+
                     case "Log in":
                         function_payload = Encoding.UTF8.GetBytes("Message from Omega Drive server on Ubuntu");
+                        break;
+
+                    case "Account authentification":
                         break;
                 }
             }

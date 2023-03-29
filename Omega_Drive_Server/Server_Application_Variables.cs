@@ -293,6 +293,7 @@ namespace Omega_Drive_Server
                 }
                 catch (Exception E)
                 {
+                    System.Diagnostics.Debug.WriteLine("Error: " + E.Message);
                     if (client != null)
                     {
                         await client.DisconnectAsync(true);

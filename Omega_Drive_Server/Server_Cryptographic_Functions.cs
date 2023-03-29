@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Security;
+using System.Text;
 using System.Threading.Tasks;
 using Cloudmersive.APIClient.NETCore.VirusScan.Api;
 using Cloudmersive.APIClient.NETCore.VirusScan.Client;
@@ -12,6 +13,19 @@ namespace Omega_Drive_Server
     {
         private static string client_certificate_name = "Client_Omega_Drive.crt";
         private static string server_certificate_name = "Server_Omega_Drive.crt";
+
+        private static string salt = "dafjlsk";
+
+        private static System.Random random_number_generator = new Random();
+
+        private static char[] symbols = new char[] { '¬', '`', '¦', '!', '"', '£', '$', '%', '^', '&', '*', '(', ')', '€', '-', '_', '=', '+', '[', '{', ']', '}', ';', ':', '\'', '@', '#', '~', ',', '<', '.', '>', '/', '?', '|', '\\' };
+        private static char[] letters = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+        private static char[] numbers = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+
+
+
+
+
 
 
         internal async Task<bool> Create_X509_Server_Certificate(string password, int certificate_valid_time_period_in_days)
@@ -217,6 +231,8 @@ namespace Omega_Drive_Server
         }
 
 
+
+
         internal async Task<string> Scan_File_With_Cloudmersive(byte[] file)
         {
             string virus_scan_result = String.Empty;
@@ -250,6 +266,115 @@ namespace Omega_Drive_Server
             }
 
             return virus_scan_result;
+        }
+
+
+
+
+        internal Task<string> Random_Alphanumeric_Code_Generator()
+        {
+
+            string generated_random_code = String.Empty;
+
+
+            for(int count = 0; count < 30; count++)
+            {
+                int generated_number = random_number_generator.Next(0, 3);
+
+
+                switch (generated_number)
+                {
+                    case 0:
+                        generated_random_code += symbols[random_number_generator.Next(0, symbols.Length)];
+                        break;
+
+
+
+                    case 1:
+
+                        int generated_option = random_number_generator.Next(0, 2);
+
+                        switch (generated_option)
+                        {
+                            case 0:
+                                generated_random_code += letters[random_number_generator.Next(0, symbols.Length)];
+                                break;
+
+                            case 1:
+                                generated_random_code += letters[random_number_generator.Next(0, symbols.Length)].ToString().ToLower();
+                                break;
+                        }
+                        break;
+
+
+
+                    case 2:
+                        generated_random_code += numbers[random_number_generator.Next(0, symbols.Length)];
+                        break;
+                }
+            }
+
+            return Task.FromResult(generated_random_code);
+        }
+
+
+
+
+        internal async Task<string> Content_Hasher(byte[] content)
+        {
+            string hashed_content = String.Empty;
+            content = Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(content) + salt);
+
+
+
+
+
+            System.Security.Cryptography.SHA256 content_hasher = System.Security.Cryptography.SHA256.Create();
+
+            try
+            {
+
+                System.IO.Stream stream = new System.IO.MemoryStream(content);
+
+                try
+                {
+                    hashed_content = Encoding.UTF8.GetString(await content_hasher.ComputeHashAsync(stream));
+                }
+                catch
+                {
+                    if (stream != null)
+                    {
+                        stream.Close();
+                    }
+                }
+                finally
+                {
+                    if (stream != null)
+                    {
+                        stream.Close();
+                        await stream.DisposeAsync();
+                    }
+                }
+            }
+            catch
+            {
+                if (content_hasher != null)
+                {
+                    content_hasher.Clear();
+                }
+            }
+            finally
+            {
+                if(content_hasher != null)
+                {
+                    content_hasher.Clear();
+                    content_hasher.Dispose();
+                }
+            }
+
+
+            return hashed_content;
+
         }
     }
 }
