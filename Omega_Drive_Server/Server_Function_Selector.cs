@@ -14,12 +14,12 @@ namespace Omega_Drive_Server
         {
             byte[] function_payload = Encoding.UTF8.GetBytes("Connection error");
 
+            function_payload = Encoding.UTF8.GetBytes("Message from Omega Drive server on Ubuntu");
             MySqlConnector.MySqlConnection connection = new MySqlConnector.MySqlConnection("Server = " + my_sql_database_server +"; User ID = " + my_sql_database_username + "; Password = " + my_sql_database_password + "; Database = " + my_sql_database_database_name);
 
             try
             {
                 await connection.OpenAsync();
-
                 switch(payload.Function)
                 {
                     case "Log in":

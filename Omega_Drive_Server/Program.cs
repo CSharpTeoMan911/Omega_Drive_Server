@@ -35,7 +35,7 @@ namespace Omega_Drive_Server
         private static async Task<bool> Application_Main_Thread()
         {
             server_socket = new System.Net.Sockets.Socket(System.Net.Sockets.AddressFamily.InterNetwork, System.Net.Sockets.SocketType.Stream, System.Net.Sockets.ProtocolType.Tcp);
-            server_socket.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, port_number));
+            server_socket.Bind(new System.Net.IPEndPoint(System.Net.IPAddress.Any, port_number));
             server_socket.ReceiveTimeout = 1000;
             server_socket.SendTimeout = 1000;
 
