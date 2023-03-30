@@ -18,6 +18,7 @@ namespace Omega_Drive_Server
 
         private Server_Function_Selector server_function_selector = new Server_Function_Selector();
 
+
         internal async Task<bool> Secure_Client_Connection(System.Net.Sockets.Socket client)
         {
             try
@@ -189,6 +190,7 @@ namespace Omega_Drive_Server
             int round_trip_time_counter = 0;
             int calculated_average_round_trip_time = 0;
             int bytes_per_second = 0;
+
 
             byte[] packet = new byte[1500];
 

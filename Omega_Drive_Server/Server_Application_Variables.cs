@@ -250,7 +250,8 @@ namespace Omega_Drive_Server
 
         protected static async Task<bool> SMTPS_Service(string user_email, string code, string function)
         {
-            bool smtps_service_result = false;
+            bool smtps_operation_is_successful = true;
+
 
             MimeKit.MimeMessage message = new MimeKit.MimeMessage();
 
@@ -274,12 +275,12 @@ namespace Omega_Drive_Server
                     {
                         case "Google":
                             smtp_server = "smtp.gmail.com";
-                            smtp_server_port = 465;
+                            smtp_server_port = 587;
                             break;
 
                         case "Microsoft":
                             smtp_server = "smtp-mail.outlook.com";
-                            smtp_server_port = 587;
+                            smtp_server_port = 465;
                             break;
                     }
 
@@ -293,7 +294,8 @@ namespace Omega_Drive_Server
                 }
                 catch (Exception E)
                 {
-                    System.Diagnostics.Debug.WriteLine("Error: " + E.Message);
+                    smtps_operation_is_successful = false;
+
                     if (client != null)
                     {
                         await client.DisconnectAsync(true);
@@ -309,7 +311,7 @@ namespace Omega_Drive_Server
             }
             catch (Exception E)
             {
-
+                smtps_operation_is_successful = false;
             }
             finally
             {
@@ -319,7 +321,7 @@ namespace Omega_Drive_Server
                 }
             }
 
-            return smtps_service_result;
+            return smtps_operation_is_successful;
         }
     }
 }

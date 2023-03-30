@@ -23,6 +23,7 @@ namespace Omega_Drive_Server
             try
             {
                 await connection.OpenAsync();
+
                 switch(payload.Function)
                 {
                     case "Register":
@@ -30,6 +31,7 @@ namespace Omega_Drive_Server
                         break;
 
                     case "Account validation":
+                        function_payload = await Authentification_Functions.Validate_Account(connection, payload);
                         break;
 
                     case "Log in":

@@ -297,11 +297,11 @@ namespace Omega_Drive_Server
                         switch (generated_option)
                         {
                             case 0:
-                                generated_random_code += letters[random_number_generator.Next(0, symbols.Length)];
+                                generated_random_code += letters[random_number_generator.Next(0, letters.Length)];
                                 break;
 
                             case 1:
-                                generated_random_code += letters[random_number_generator.Next(0, symbols.Length)].ToString().ToLower();
+                                generated_random_code += letters[random_number_generator.Next(0, letters.Length)].ToString().ToLower();
                                 break;
                         }
                         break;
@@ -309,7 +309,7 @@ namespace Omega_Drive_Server
 
 
                     case 2:
-                        generated_random_code += numbers[random_number_generator.Next(0, symbols.Length)];
+                        generated_random_code += numbers[random_number_generator.Next(0, numbers.Length)];
                         break;
                 }
             }
@@ -320,61 +320,91 @@ namespace Omega_Drive_Server
 
 
 
-        internal async Task<string> Content_Hasher(byte[] content)
+        internal async Task<string> Content_Hasher<Content>(Content content)
         {
             string hashed_content = String.Empty;
-            content = Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(content) + salt);
+
+            byte[] extracted_content = new byte[] { };
 
 
 
 
 
-            System.Security.Cryptography.SHA256 content_hasher = System.Security.Cryptography.SHA256.Create();
 
-            try
+
+            if (content.GetType() == extracted_content.GetType())
             {
+                extracted_content = content as byte[];
+            }
+            else if (content.GetType() == typeof(string))
+            {
+                extracted_content = Encoding.UTF8.GetBytes(content as string);
+            }
+            else
+            {
+                hashed_content = "Error occured";
+            }
 
-                System.IO.Stream stream = new System.IO.MemoryStream(content);
+
+
+
+
+
+            if(hashed_content != "Error occured")
+            {
+                extracted_content = Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(extracted_content) + salt);
+
+
+                System.Security.Cryptography.SHA256 content_hasher = System.Security.Cryptography.SHA256.Create();
 
                 try
                 {
-                    hashed_content = Encoding.UTF8.GetString(await content_hasher.ComputeHashAsync(stream));
+
+                    System.IO.Stream stream = new System.IO.MemoryStream(extracted_content);
+
+                    try
+                    {
+                        hashed_content = Encoding.UTF8.GetString(await content_hasher.ComputeHashAsync(stream));
+                    }
+                    catch
+                    {
+                        hashed_content = "Error occured";
+
+                        if (stream != null)
+                        {
+                            stream.Close();
+                        }
+                    }
+                    finally
+                    {
+                        if (stream != null)
+                        {
+                            stream.Close();
+                            await stream.DisposeAsync();
+                        }
+                    }
                 }
                 catch
                 {
-                    if (stream != null)
+                    hashed_content = "Error occured";
+
+                    if (content_hasher != null)
                     {
-                        stream.Close();
+                        content_hasher.Clear();
                     }
                 }
                 finally
                 {
-                    if (stream != null)
+                    if (content_hasher != null)
                     {
-                        stream.Close();
-                        await stream.DisposeAsync();
+                        content_hasher.Clear();
+                        content_hasher.Dispose();
                     }
-                }
-            }
-            catch
-            {
-                if (content_hasher != null)
-                {
-                    content_hasher.Clear();
-                }
-            }
-            finally
-            {
-                if(content_hasher != null)
-                {
-                    content_hasher.Clear();
-                    content_hasher.Dispose();
                 }
             }
 
 
             return hashed_content;
-
         }
     }
 }
