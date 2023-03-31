@@ -14,10 +14,6 @@ namespace Omega_Drive_Server
         private Server_Cryptographic_Functions Server_Cryptographic_Functions = new Server_Cryptographic_Functions();
 
 
-        private byte[] connection_failed_message = Encoding.UTF8.GetBytes("Connection failed");
-        private byte[] email_already_in_use_message = Encoding.UTF8.GetBytes("Email already in use");
-        private byte[] code_verification_error_message = Encoding.UTF8.GetBytes("Code verification error");
-
 
 
 
@@ -53,60 +49,69 @@ namespace Omega_Drive_Server
 
 
 
-
-
-                MySqlConnector.MySqlCommand verify_if_code_exists_command = new MySqlConnector.MySqlCommand("SELECT user_email FROM accounts_pending_for_validation WHERE one_time_account_validation_code = @one_time_account_validation_code;", connection);
-
-                try
+                if (password_hashing_result != "Error occured" && code_hashing_result != "Error occured")
                 {
-                    verify_if_code_exists_command.Parameters.AddWithValue("one_time_account_validation_code", code_hashing_result);
-
-                    MySqlConnector.MySqlDataReader verify_if_code_exists_command_reader = await verify_if_code_exists_command.ExecuteReaderAsync();
+                    MySqlConnector.MySqlCommand verify_if_code_exists_command = new MySqlConnector.MySqlCommand("SELECT user_email FROM accounts_pending_for_validation WHERE one_time_account_validation_code = @one_time_account_validation_code;", connection);
 
                     try
                     {
-                        if(await verify_if_code_exists_command_reader.ReadAsync() == true)
+                        verify_if_code_exists_command.Parameters.AddWithValue("one_time_account_validation_code", code_hashing_result);
+
+                        MySqlConnector.MySqlDataReader verify_if_code_exists_command_reader = await verify_if_code_exists_command.ExecuteReaderAsync();
+
+                        try
                         {
-
-                            if (verify_if_code_exists_command != null)
+                            if (await verify_if_code_exists_command_reader.ReadAsync() == true)
                             {
-                                await verify_if_code_exists_command.DisposeAsync();
-                            }
 
+                                if (verify_if_code_exists_command != null)
+                                {
+                                    await verify_if_code_exists_command.DisposeAsync();
+                                }
+
+                                if (verify_if_code_exists_command_reader != null)
+                                {
+                                    await verify_if_code_exists_command_reader.CloseAsync();
+                                    await verify_if_code_exists_command_reader.DisposeAsync();
+                                }
+
+                                goto Code_Generation;
+                            }
+                        }
+                        catch (Exception E)
+                        {
+                            registration_result = connection_failed_message;
+                            goto Code_Generation_Failed;
+                        }
+                        finally
+                        {
                             if (verify_if_code_exists_command_reader != null)
                             {
                                 await verify_if_code_exists_command_reader.CloseAsync();
                                 await verify_if_code_exists_command_reader.DisposeAsync();
                             }
-
-                            goto Code_Generation;
                         }
                     }
                     catch (Exception E)
                     {
-                        registration_result = code_verification_error_message;
+                        registration_result = connection_failed_message;
+                        goto Code_Generation_Failed;
                     }
                     finally
                     {
-                        if (verify_if_code_exists_command_reader != null)
+                        if (verify_if_code_exists_command != null)
                         {
-                            await verify_if_code_exists_command_reader.CloseAsync();
-                            await verify_if_code_exists_command_reader.DisposeAsync();
+                            await verify_if_code_exists_command.DisposeAsync();
                         }
                     }
                 }
-                catch (Exception E)
+                else
                 {
-                    registration_result = code_verification_error_message;
-                }
-                finally
-                {
-                    if(verify_if_code_exists_command != null)
-                    {
-                        await verify_if_code_exists_command.DisposeAsync();
-                    }
+                    registration_result = connection_failed_message;
+                    goto Code_Generation_Failed;
                 }
 
+                
 
 
 
@@ -118,84 +123,84 @@ namespace Omega_Drive_Server
 
 
 
-                if(Encoding.UTF8.GetString(registration_result) != "Code verification error")
+
+                if (await SMTPS_Service(client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key, code, client_WSDL_Payload.Function) == true)
                 {
-                    if (await SMTPS_Service(client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key, code, client_WSDL_Payload.Function) == true)
+
+
+                    if (password_hashing_result != "Error occured" && code_hashing_result != "Error occured")
                     {
 
+                        MySqlConnector.MySqlCommand account_insertion_command = new MySqlConnector.MySqlCommand("INSERT INTO user_accounts VALUES(@user_email, @user_password, FALSE);", connection);
 
-                        if (password_hashing_result != "Error occured" && code_hashing_result != "Error occured")
+                        try
+                        {
+                            account_insertion_command.Parameters.AddWithValue("user_email", client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key);
+                            account_insertion_command.Parameters.AddWithValue("user_password", password_hashing_result);
+                            await account_insertion_command.ExecuteNonQueryAsync();
+                        }
+                        catch (Exception E)
+                        {
+                            registration_result = email_already_in_use_message;
+                        }
+                        finally
+                        {
+                            if (account_insertion_command != null)
+                            {
+                                await account_insertion_command.DisposeAsync();
+                            }
+                        }
+
+
+
+
+
+
+
+
+                        if (Encoding.UTF8.GetString(registration_result) != "Email already in use")
                         {
 
-                            MySqlConnector.MySqlCommand account_insertion_command = new MySqlConnector.MySqlCommand("INSERT INTO user_accounts VALUES(@user_email, @user_password, FALSE);", connection);
+                            MySqlConnector.MySqlCommand pending_account_validation_session_insertion_command = new MySqlConnector.MySqlCommand("INSERT INTO accounts_pending_for_validation VALUES(@user_email, @one_time_account_validation_code, NOW() + INTERVAL 2 HOUR);", connection);
 
                             try
                             {
-                                account_insertion_command.Parameters.AddWithValue("user_email", client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key);
-                                account_insertion_command.Parameters.AddWithValue("user_password", password_hashing_result);
-                                await account_insertion_command.ExecuteNonQueryAsync();
+                                pending_account_validation_session_insertion_command.Parameters.AddWithValue("user_email", client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key);
+                                pending_account_validation_session_insertion_command.Parameters.AddWithValue("one_time_account_validation_code", code_hashing_result);
+                                await pending_account_validation_session_insertion_command.ExecuteNonQueryAsync();
+
+                                registration_result = account_registration_successful;
                             }
                             catch (Exception E)
                             {
-                                registration_result = email_already_in_use_message;
+                                registration_result = connection_failed_message;
                             }
                             finally
                             {
-                                if (account_insertion_command != null)
+                                if (pending_account_validation_session_insertion_command != null)
                                 {
-                                    await account_insertion_command.DisposeAsync();
+                                    await pending_account_validation_session_insertion_command.DisposeAsync();
                                 }
                             }
-
-
-
-
-
-
-
-
-                            if (Encoding.UTF8.GetString(registration_result) != "Email already in use")
-                            {
-
-                                MySqlConnector.MySqlCommand pending_account_validation_session_insertion_command = new MySqlConnector.MySqlCommand("INSERT INTO accounts_pending_for_validation VALUES(@user_email, @one_time_account_validation_code, NOW() + INTERVAL 2 HOUR);", connection);
-
-                                try
-                                {
-                                    pending_account_validation_session_insertion_command.Parameters.AddWithValue("user_email", client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key);
-                                    pending_account_validation_session_insertion_command.Parameters.AddWithValue("one_time_account_validation_code", code_hashing_result);
-                                    await pending_account_validation_session_insertion_command.ExecuteNonQueryAsync();
-                                }
-                                catch (Exception E)
-                                {
-                                    registration_result = connection_failed_message;
-                                }
-                                finally
-                                {
-                                    if (pending_account_validation_session_insertion_command != null)
-                                    {
-                                        await pending_account_validation_session_insertion_command.DisposeAsync();
-                                    }
-                                }
-
-                            }
-
 
                         }
 
+
                     }
-                    else
-                    {
-                        registration_result = connection_failed_message;
-                    }
+
+                }
+                else
+                {
+                    registration_result = connection_failed_message;
                 }
 
 
+            Code_Generation_Failed:;
             }
             catch (Exception E)
             {
-                registration_result = Encoding.UTF8.GetBytes("Invalid email address");
+                registration_result = invalid_email_address;
             }
-
 
 
             return registration_result;
@@ -311,6 +316,77 @@ namespace Omega_Drive_Server
 
 
             return validation_result;
+        }
+
+
+
+
+        internal async Task<byte[]> Log_In_Account(MySqlConnector.MySqlConnection connection, Client_WSDL_Payload client_WSDL_Payload)
+        {
+            byte[] log_in_account_result = connection_failed_message;
+
+            MySqlConnector.MySqlCommand verify_user_credentials_command = new MySqlConnector.MySqlCommand("SELECT user_email, user_account_validated FROM user_accounts WHERE user_password = @user_password;");
+
+            try
+            {
+                verify_user_credentials_command.Parameters.AddWithValue("user_password", await Server_Cryptographic_Functions.Content_Hasher<byte[]>(client_WSDL_Payload.Password___Or___Binary_Content));
+
+
+                MySqlConnector.MySqlDataReader verify_user_credentials_command_reader = await verify_user_credentials_command.ExecuteReaderAsync();
+
+                try
+                {
+                    if(await verify_user_credentials_command_reader.ReadAsync() == true)
+                    {
+                        if ((string)verify_user_credentials_command_reader["user_email"] == client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key)
+                        {
+
+                            if ((bool)verify_user_credentials_command_reader["user_account_validated"] == true)
+                            {
+
+                            }
+                            else
+                            {
+                                log_in_account_result = account_not_validated;
+                            }
+                        }
+                        else
+                        {
+                            log_in_account_result = invalid_email;
+                        }
+                    }
+                    else
+                    {
+                        log_in_account_result = invalid_password;
+                    }
+                }
+                catch
+                {
+                    log_in_account_result = connection_failed_message;
+                }
+                finally
+                {
+                    if(verify_user_credentials_command_reader != null)
+                    {
+                        await verify_user_credentials_command_reader.CloseAsync();
+                        await verify_user_credentials_command_reader.DisposeAsync();
+                    }
+                }
+
+            }
+            catch(Exception E)
+            {
+                log_in_account_result = connection_failed_message;
+            }
+            finally
+            {
+                if(verify_user_credentials_command != null)
+                {
+                    await verify_user_credentials_command.DisposeAsync();
+                }
+            }
+
+            return log_in_account_result;
         }
     }
 }

@@ -9,6 +9,16 @@ namespace Omega_Drive_Server
 {
     class Server_Application_Variables
     {
+        protected static byte[] connection_failed_message = Encoding.UTF8.GetBytes("Connection failed");
+        protected static byte[] email_already_in_use_message = Encoding.UTF8.GetBytes("Email already in use");
+        protected static byte[] account_registration_successful = Encoding.UTF8.GetBytes("Registration successful");
+        protected static byte[] invalid_email_address = Encoding.UTF8.GetBytes("Invalid email address");
+        protected static byte[] invalid_password = Encoding.UTF8.GetBytes("Invalid password");
+        protected static byte[] invalid_email = Encoding.UTF8.GetBytes("Invalid email");
+        protected static byte[] account_not_validated = Encoding.UTF8.GetBytes("Un-validated account");
+
+
+
 
         private static string server_settings_file_name = "application_settings.json";
 
