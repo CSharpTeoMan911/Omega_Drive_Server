@@ -16,6 +16,8 @@ namespace Omega_Drive_Server
         protected static byte[] invalid_password = Encoding.UTF8.GetBytes("Invalid password");
         protected static byte[] invalid_email = Encoding.UTF8.GetBytes("Invalid email");
         protected static byte[] account_not_validated = Encoding.UTF8.GetBytes("Un-validated account");
+        protected static byte[] login_successful = Encoding.UTF8.GetBytes("Log in successful");
+
 
 
 

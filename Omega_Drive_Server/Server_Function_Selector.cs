@@ -35,7 +35,7 @@ namespace Omega_Drive_Server
                         break;
 
                     case "Log in":
-                        function_payload = Encoding.UTF8.GetBytes("Message from Omega Drive server on Ubuntu");
+                        function_payload = await Authentification_Functions.Log_In_Account(connection, payload);
                         break;
 
                     case "Account authentification":

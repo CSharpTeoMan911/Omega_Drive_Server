@@ -39,11 +39,15 @@ namespace Omega_Drive_Server
 
 
 
-            Code_Generation:
+
 
                 string code = await Server_Cryptographic_Functions.Random_Alphanumeric_Code_Generator();
 
                 string code_hashing_result = await Server_Cryptographic_Functions.Content_Hasher<string>(code);
+
+
+
+
 
 
 
@@ -63,7 +67,6 @@ namespace Omega_Drive_Server
                         {
                             if (await verify_if_code_exists_command_reader.ReadAsync() == true)
                             {
-
                                 if (verify_if_code_exists_command != null)
                                 {
                                     await verify_if_code_exists_command.DisposeAsync();
@@ -75,13 +78,20 @@ namespace Omega_Drive_Server
                                     await verify_if_code_exists_command_reader.DisposeAsync();
                                 }
 
-                                goto Code_Generation;
+                                registration_result = connection_failed_message;
+                                goto Registration_Error;
                             }
                         }
                         catch (Exception E)
                         {
+                            if (verify_if_code_exists_command_reader != null)
+                            {
+                                await verify_if_code_exists_command_reader.CloseAsync();
+                                await verify_if_code_exists_command_reader.DisposeAsync();
+                            }
+
                             registration_result = connection_failed_message;
-                            goto Code_Generation_Failed;
+                            goto Registration_Error;
                         }
                         finally
                         {
@@ -94,8 +104,13 @@ namespace Omega_Drive_Server
                     }
                     catch (Exception E)
                     {
+                        if (verify_if_code_exists_command != null)
+                        {
+                            await verify_if_code_exists_command.DisposeAsync();
+                        }
+
                         registration_result = connection_failed_message;
-                        goto Code_Generation_Failed;
+                        goto Registration_Error;
                     }
                     finally
                     {
@@ -108,10 +123,10 @@ namespace Omega_Drive_Server
                 else
                 {
                     registration_result = connection_failed_message;
-                    goto Code_Generation_Failed;
+                    goto Registration_Error;
                 }
 
-                
+
 
 
 
@@ -141,7 +156,13 @@ namespace Omega_Drive_Server
                         }
                         catch (Exception E)
                         {
+                            if(account_insertion_command != null)
+                            {
+                                await account_insertion_command.DisposeAsync();
+                            }
+
                             registration_result = email_already_in_use_message;
+                            goto Registration_Error;
                         }
                         finally
                         {
@@ -183,6 +204,7 @@ namespace Omega_Drive_Server
                                 }
                             }
 
+
                         }
 
 
@@ -193,9 +215,6 @@ namespace Omega_Drive_Server
                 {
                     registration_result = connection_failed_message;
                 }
-
-
-            Code_Generation_Failed:;
             }
             catch (Exception E)
             {
@@ -203,6 +222,7 @@ namespace Omega_Drive_Server
             }
 
 
+        Registration_Error:
             return registration_result;
         }
 
@@ -217,7 +237,7 @@ namespace Omega_Drive_Server
         internal async Task<byte[]> Validate_Account(MySqlConnector.MySqlConnection connection, Client_WSDL_Payload client_WSDL_Payload)
         {
 
-            byte[] validation_result = Encoding.UTF8.GetBytes("Connection error");
+            byte[] validation_result = connection_failed_message;
             string user_email = String.Empty;
 
 
@@ -321,71 +341,209 @@ namespace Omega_Drive_Server
 
 
 
+
+
+
+
+
+
+
+
         internal async Task<byte[]> Log_In_Account(MySqlConnector.MySqlConnection connection, Client_WSDL_Payload client_WSDL_Payload)
         {
             byte[] log_in_account_result = connection_failed_message;
 
-            MySqlConnector.MySqlCommand verify_user_credentials_command = new MySqlConnector.MySqlCommand("SELECT user_email, user_account_validated FROM user_accounts WHERE user_password = @user_password;");
+
+
+
+
+
+            MySqlConnector.MySqlCommand verify_user_credentials_command = new MySqlConnector.MySqlCommand("SELECT user_email, user_account_validated FROM user_accounts WHERE user_password = @user_password;", connection);
 
             try
             {
                 verify_user_credentials_command.Parameters.AddWithValue("user_password", await Server_Cryptographic_Functions.Content_Hasher<byte[]>(client_WSDL_Payload.Password___Or___Binary_Content));
 
-
                 MySqlConnector.MySqlDataReader verify_user_credentials_command_reader = await verify_user_credentials_command.ExecuteReaderAsync();
 
                 try
                 {
-                    if(await verify_user_credentials_command_reader.ReadAsync() == true)
+                    if (await verify_user_credentials_command_reader.ReadAsync() == true)
                     {
+
+
                         if ((string)verify_user_credentials_command_reader["user_email"] == client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key)
                         {
 
-                            if ((bool)verify_user_credentials_command_reader["user_account_validated"] == true)
+
+                            if ((bool)verify_user_credentials_command_reader["user_account_validated"] == false)
                             {
 
-                            }
-                            else
-                            {
+
+                                if (verify_user_credentials_command != null)
+                                {
+                                    await verify_user_credentials_command.DisposeAsync();
+                                }
+
+                                if (verify_user_credentials_command_reader != null)
+                                {
+                                    await verify_user_credentials_command_reader.CloseAsync();
+                                    await verify_user_credentials_command_reader.DisposeAsync();
+                                }
+
                                 log_in_account_result = account_not_validated;
+                                goto Log_In_Error;
+
+
                             }
+
+
                         }
                         else
                         {
+
+
+                            if (verify_user_credentials_command != null)
+                            {
+                                await verify_user_credentials_command.DisposeAsync();
+                            }
+
+                            if (verify_user_credentials_command_reader != null)
+                            {
+                                await verify_user_credentials_command_reader.CloseAsync();
+                                await verify_user_credentials_command_reader.DisposeAsync();
+                            }
+
                             log_in_account_result = invalid_email;
+                            goto Log_In_Error;
+
+
                         }
                     }
                     else
                     {
+
+
+                        if (verify_user_credentials_command != null)
+                        {
+                            await verify_user_credentials_command.DisposeAsync();
+                        }
+
+                        if (verify_user_credentials_command_reader != null)
+                        {
+                            await verify_user_credentials_command_reader.CloseAsync();
+                            await verify_user_credentials_command_reader.DisposeAsync();
+                        }
+
                         log_in_account_result = invalid_password;
+                        goto Log_In_Error;
+
+
                     }
                 }
                 catch
+                {
+
+
+                    if (verify_user_credentials_command_reader != null)
+                    {
+                        await verify_user_credentials_command_reader.CloseAsync();
+                        await verify_user_credentials_command_reader.DisposeAsync();
+                    }
+
+                    log_in_account_result = connection_failed_message;
+                    goto Log_In_Error;
+
+
+                }
+                finally
+                {
+
+
+                    if (verify_user_credentials_command_reader != null)
+                    {
+                        await verify_user_credentials_command_reader.CloseAsync();
+                        await verify_user_credentials_command_reader.DisposeAsync();
+                    }
+
+
+                }
+
+            }
+            catch (Exception E)
+            {
+
+
+                if (verify_user_credentials_command != null)
+                {
+                    await verify_user_credentials_command.DisposeAsync();
+                }
+
+                log_in_account_result = connection_failed_message;
+                goto Log_In_Error;
+
+
+            }
+            finally
+            {
+
+
+                if (verify_user_credentials_command != null)
+                {
+                    await verify_user_credentials_command.DisposeAsync();
+                }
+
+
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            string code = await Server_Cryptographic_Functions.Random_Alphanumeric_Code_Generator();
+            string code_hashing_result = await Server_Cryptographic_Functions.Content_Hasher<string>(code);
+
+
+            if (code_hashing_result != "Error occured")
+            {
+                MySqlConnector.MySqlCommand delete_pending_account_validation_session = new MySqlConnector.MySqlCommand("INSERT INTO pending_log_in_sessions VALUES(@one_time_log_in_session_code, @user_email, NOW() + INTERVAL 5 MINUTE)", connection);
+
+
+                try
+                {
+                    delete_pending_account_validation_session.Parameters.AddWithValue("one_time_log_in_session_code", code_hashing_result);
+                    delete_pending_account_validation_session.Parameters.AddWithValue("user_email", client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key);
+                    await delete_pending_account_validation_session.ExecuteNonQueryAsync();
+                }
+                catch (Exception E)
                 {
                     log_in_account_result = connection_failed_message;
                 }
                 finally
                 {
-                    if(verify_user_credentials_command_reader != null)
+                    if (delete_pending_account_validation_session != null)
                     {
-                        await verify_user_credentials_command_reader.CloseAsync();
-                        await verify_user_credentials_command_reader.DisposeAsync();
+                        await delete_pending_account_validation_session.DisposeAsync();
                     }
                 }
-
             }
-            catch(Exception E)
+            else
             {
                 log_in_account_result = connection_failed_message;
             }
-            finally
-            {
-                if(verify_user_credentials_command != null)
-                {
-                    await verify_user_credentials_command.DisposeAsync();
-                }
-            }
 
+
+        Log_In_Error:
             return log_in_account_result;
         }
     }
