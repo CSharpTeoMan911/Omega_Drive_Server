@@ -12,6 +12,11 @@ namespace Omega_Drive_Server
         {
             byte[] serialized_payload = new byte[1024];
 
+            if(payload == null)
+            {
+                payload = new byte[1024];
+            }
+
 
             System.IO.StringWriter payload_stream = new StringWriter_Encoding();
 

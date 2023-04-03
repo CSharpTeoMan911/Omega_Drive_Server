@@ -27,9 +27,21 @@ namespace Omega_Drive_Server
 
 
 
-            try
+
+
+            if (Encoding.UTF8.GetString(client_WSDL_Payload.Password___Or___Binary_Content).Length >= 6)
             {
-                System.Net.Mail.MailAddress address = new System.Net.Mail.MailAddress(client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key);
+
+                try
+                {
+                    System.Net.Mail.MailAddress address = new System.Net.Mail.MailAddress(client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key);
+                }
+                catch
+                {
+                    registration_result = invalid_email_address;
+                    goto Registration_Error;
+                }
+
 
                 string password_hashing_result = await Server_Cryptographic_Functions.Content_Hasher<byte[]>(client_WSDL_Payload.Password___Or___Binary_Content);
 
@@ -139,7 +151,7 @@ namespace Omega_Drive_Server
 
 
 
-                if (await SMTPS_Service(client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key, code, client_WSDL_Payload.Function) == true)
+                if (await SMTPS_Service(client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key, code, "Account validation") == true)
                 {
 
 
@@ -156,7 +168,7 @@ namespace Omega_Drive_Server
                         }
                         catch (Exception E)
                         {
-                            if(account_insertion_command != null)
+                            if (account_insertion_command != null)
                             {
                                 await account_insertion_command.DisposeAsync();
                             }
@@ -216,9 +228,9 @@ namespace Omega_Drive_Server
                     registration_result = connection_failed_message;
                 }
             }
-            catch (Exception E)
+            else
             {
-                registration_result = invalid_email_address;
+                registration_result = invalid_password_length;
             }
 
 
@@ -254,14 +266,32 @@ namespace Omega_Drive_Server
 
                 try
                 {
-                    if(await account_validation_code_verification_command_reader.ReadAsync() == true)
+                    if (await account_validation_code_verification_command_reader.ReadAsync() == true)
                     {
                         user_email = (string)account_validation_code_verification_command_reader["user_email"];
+                    }
+                    else
+                    {
+                        validation_result = invalid_account_validation_code;
+
+                        if (account_validation_code_verification_command_reader != null)
+                        {
+                            await account_validation_code_verification_command_reader.CloseAsync();
+                            await account_validation_code_verification_command_reader.DisposeAsync();
+                        }
+
+                        goto Account_Validation_Error;
                     }
                 }
                 catch (Exception E)
                 {
-                    
+                    if (account_validation_code_verification_command_reader != null)
+                    {
+                        await account_validation_code_verification_command_reader.CloseAsync();
+                        await account_validation_code_verification_command_reader.DisposeAsync();
+                    }
+
+                    goto Account_Validation_Error;
                 }
                 finally
                 {
@@ -275,11 +305,16 @@ namespace Omega_Drive_Server
             }
             catch (Exception E)
             {
+                if (account_validation_code_verification_command != null)
+                { 
+                    await account_validation_code_verification_command.DisposeAsync();
+                }
 
+                goto Account_Validation_Error;
             }
             finally
             {
-                if(account_validation_code_verification_command != null)
+                if (account_validation_code_verification_command != null)
                 {
                     await account_validation_code_verification_command.DisposeAsync();
                 }
@@ -301,11 +336,16 @@ namespace Omega_Drive_Server
             }
             catch
             {
+                if (remove_pending_account_validation_command != null)
+                {
+                    await remove_pending_account_validation_command.DisposeAsync();
+                }
 
+                goto Account_Validation_Error;
             }
             finally
             {
-                if(remove_pending_account_validation_command != null)
+                if (remove_pending_account_validation_command != null)
                 {
                     await remove_pending_account_validation_command.DisposeAsync();
                 }
@@ -321,6 +361,8 @@ namespace Omega_Drive_Server
             {
                 account_validation_command.Parameters.AddWithValue("user_email", user_email);
                 await account_validation_command.ExecuteNonQueryAsync();
+
+                validation_result = account_validation_successful;
             }
             catch
             {
@@ -335,6 +377,7 @@ namespace Omega_Drive_Server
             }
 
 
+        Account_Validation_Error:
             return validation_result;
         }
 
@@ -393,8 +436,6 @@ namespace Omega_Drive_Server
 
                                 log_in_account_result = account_not_validated;
                                 goto Log_In_Error;
-
-
                             }
 
 
@@ -414,7 +455,7 @@ namespace Omega_Drive_Server
                                 await verify_user_credentials_command_reader.DisposeAsync();
                             }
 
-                            log_in_account_result = invalid_email;
+                            log_in_account_result = invalid_email_address;
                             goto Log_In_Error;
 
 
@@ -441,10 +482,8 @@ namespace Omega_Drive_Server
 
                     }
                 }
-                catch
+                catch(Exception E)
                 {
-
-
                     if (verify_user_credentials_command_reader != null)
                     {
                         await verify_user_credentials_command_reader.CloseAsync();
@@ -472,8 +511,6 @@ namespace Omega_Drive_Server
             }
             catch (Exception E)
             {
-
-
                 if (verify_user_credentials_command != null)
                 {
                     await verify_user_credentials_command.DisposeAsync();
@@ -524,6 +561,8 @@ namespace Omega_Drive_Server
                     delete_pending_account_validation_session.Parameters.AddWithValue("one_time_log_in_session_code", code_hashing_result);
                     delete_pending_account_validation_session.Parameters.AddWithValue("user_email", client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key);
                     await delete_pending_account_validation_session.ExecuteNonQueryAsync();
+
+                    log_in_account_result = login_successful;
                 }
                 catch (Exception E)
                 {
