@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using BenchmarkDotNet.Attributes;
 using Cloudmersive.APIClient.NETCore.VirusScan.Api;
 using Cloudmersive.APIClient.NETCore.VirusScan.Client;
 using Cloudmersive.APIClient.NETCore.VirusScan.Model;
@@ -11,16 +15,51 @@ namespace Omega_Drive_Server
 {
     class Server_Cryptographic_Functions:Server_Application_Variables
     {
+
+        // VARIABLES USED FOR THE GENERATION OF BOTH THE SERVER AND CLIENT SSL CERTIFICATES
+        //
+        // [ BEGIN ]
+
         private static string client_certificate_name = "Client_Omega_Drive.crt";
         private static string server_certificate_name = "Server_Omega_Drive.crt";
 
-        private static string salt = "dafjlsk";
 
+        private static Org.BouncyCastle.Crypto.Prng.CryptoApiRandomGenerator randomGenerator = new Org.BouncyCastle.Crypto.Prng.CryptoApiRandomGenerator();
+        private static Org.BouncyCastle.X509.X509V3CertificateGenerator certificateGenerator = new Org.BouncyCastle.X509.X509V3CertificateGenerator();
+
+
+        private static Org.BouncyCastle.Asn1.X509.X509Name subjectDN = new Org.BouncyCastle.Asn1.X509.X509Name("CN=Omega_Drive_Certificate");
+        private static Org.BouncyCastle.Asn1.X509.X509Name issuerDN = subjectDN;
+
+
+        private static int strength = 2048;
+
+        // [ END ]
+
+
+
+
+
+
+
+
+
+        // VARIABLES USED FOR RANDOM CODE GENERATION, CONTENT HASHING, AND PASSWORD SALTING
+        //
+        // [ BEGIN ]
+
+        private static string salt = "dafjlsk";
         private static System.Random random_number_generator = new Random();
 
-        private static char[] symbols = new char[] { '¬', '`', '¦', '!', '"', '£', '$', '%', '^', '&', '*', '(', ')', '€', '-', '_', '=', '+', '[', '{', ']', '}', ';', ':', '\'', '@', '#', '~', ',', '<', '.', '>', '/', '?', '|', '\\' };
-        private static char[] letters = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
-        private static char[] numbers = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+
+        private static List<char> symbols = new List<char> { '¬', '`', '¦', '!', '"', '£', '$', '%', '^', '&', '*', '(', ')', '€', '-', '_', '=', '+', '[', '{', ']', '}', ';', ':', '\'', '@', '#', '~', ',', '<', '.', '>', '/', '?', '|', '\\' };
+        private static List<char> letters = new List<char> { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+        private static List<char> numbers = new List<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+
+
+        private static System.Security.Cryptography.SHA256 content_hasher = System.Security.Cryptography.SHA256.Create();
+
+        // [ END ]
 
 
 
@@ -28,6 +67,26 @@ namespace Omega_Drive_Server
 
 
 
+
+
+        // StringBuilders USED TO MANIPULATE AND CONSTRUCT STRINGS IN ORDER TO LOWER THE NUMBER OF MEMORY ALLOCATIONS 
+        // 
+        // [ BEGIN ]
+
+        private static StringBuilder random_code_builder = new StringBuilder(30);
+        private static StringBuilder file_path_builder = new StringBuilder();
+
+        // [ END ]
+
+
+
+
+
+
+
+
+
+        // METHOD THAT IS CREATING A X509 SSL CERTIFICATE THAT HAS SHA256 WITH RSA BASED ENCRYPTION
         internal async Task<bool> Create_X509_Server_Certificate(string password, int certificate_valid_time_period_in_days)
         {
 
@@ -36,20 +95,14 @@ namespace Omega_Drive_Server
 
             try
             {
-                Org.BouncyCastle.Crypto.Prng.CryptoApiRandomGenerator randomGenerator = new Org.BouncyCastle.Crypto.Prng.CryptoApiRandomGenerator();
                 Org.BouncyCastle.Security.SecureRandom random = new Org.BouncyCastle.Security.SecureRandom(randomGenerator);
-
-
-                Org.BouncyCastle.X509.X509V3CertificateGenerator certificateGenerator = new Org.BouncyCastle.X509.X509V3CertificateGenerator();
-
-
                 Org.BouncyCastle.Math.BigInteger serialNumber = Org.BouncyCastle.Utilities.BigIntegers.CreateRandomInRange(Org.BouncyCastle.Math.BigInteger.One, Org.BouncyCastle.Math.BigInteger.ValueOf(int.MaxValue), random);
                 certificateGenerator.SetSerialNumber(serialNumber);
 
 
 
-                Org.BouncyCastle.Asn1.X509.X509Name subjectDN = new Org.BouncyCastle.Asn1.X509.X509Name("CN=Omega_Drive_Certificate");
-                Org.BouncyCastle.Asn1.X509.X509Name issuerDN = subjectDN;
+
+
                 certificateGenerator.SetIssuerDN(issuerDN);
                 certificateGenerator.SetSubjectDN(subjectDN);
 
@@ -63,7 +116,7 @@ namespace Omega_Drive_Server
 
 
 
-                const int strength = 2048;
+
                 Org.BouncyCastle.Crypto.KeyGenerationParameters keyGenerationParameters = new Org.BouncyCastle.Crypto.KeyGenerationParameters(random, strength);
 
                 Org.BouncyCastle.Crypto.Generators.RsaKeyPairGenerator keyPairGenerator = new Org.BouncyCastle.Crypto.Generators.RsaKeyPairGenerator();
@@ -190,13 +243,23 @@ namespace Omega_Drive_Server
             }
             catch
             {
-                
+
             }
 
 
             return server_certificate_creation_successful;
         }
 
+
+
+
+
+
+
+
+
+        // METHOD THAT IS LOADING THE X509 CERTIFICATE INTO MEMORY BY SEARCHING THE APPLICATION'S DIRECTORY FOR A X509
+        // CERTIFICATE AND LOADING ITS BINARIES INTO A X509Certificate2 OBJECT
         internal Task<bool> Load_Server_Certificate_In_Application_Memory()
         {
             bool server_certificate_load_successful = false;
@@ -205,19 +268,21 @@ namespace Omega_Drive_Server
             {
                 if (System.IO.File.Exists(server_certificate_name) == true)
                 {
-                    string file_path = String.Empty;
-
-                    if (OperatingSystem.IsWindows() == true)
+                    lock(file_path_builder)
                     {
-                        file_path = Environment.CurrentDirectory + "\\" + server_certificate_name;
-                    }
-                    else
-                    {
-                        file_path = Environment.CurrentDirectory + "/" + server_certificate_name;
-                    }
+                        if (OperatingSystem.IsWindows() == true)
+                        {
+                            file_path_builder.Append(Environment.CurrentDirectory + "\\" + server_certificate_name);
+                        }
+                        else
+                        {
+                            file_path_builder.Append(Environment.CurrentDirectory + "/" + server_certificate_name);
+                        }
 
+                        server_certificate = new System.Security.Cryptography.X509Certificates.X509Certificate2(file_path_builder.ToString(), server_ssl_certificate_password);
 
-                    server_certificate = new System.Security.Cryptography.X509Certificates.X509Certificate2(file_path, server_ssl_certificate_password);
+                        file_path_builder.Clear();
+                    }
 
                     server_certificate_load_successful = true;
                 }
@@ -233,6 +298,17 @@ namespace Omega_Drive_Server
 
 
 
+
+
+
+
+
+
+        
+
+
+        // METHOD THAT IS SCANNING A FILE WITH THE CLOUDMERSIVE AV THROUGH
+        // ITS OWN API.
         internal async Task<string> Scan_File_With_Cloudmersive(byte[] file)
         {
             string virus_scan_result = String.Empty;
@@ -258,7 +334,6 @@ namespace Omega_Drive_Server
                     virus_scan_result = "Virus found";
                 }
 
-                Debug.WriteLine(Virus_Scan_Result);
             }
             catch(Exception E)
             {
@@ -271,51 +346,84 @@ namespace Omega_Drive_Server
 
 
 
+
+
+
+
+
+
+
+        // FORCE THE COMPILER TO DROP JUST IN TIME OPTIMIZATIONS AND COMPILE THE METHOD
+        // IN ASSEMBLY LANGUAGE AS FAST AS POSSIBLE. THIS IS DONE BECAUSE THIS IS A METHOD
+        // THAT IS CALLED OFTEN AND JUST IN TIME COMPILATION OPTIMIZATIONS EAT A LOT OF 
+        // RESOURCES. THIS METHOD IS GENERATING RANDOM NUMBERS AND DUE TO ITS SIMPLISTIC
+        // STRUCTURE, JUST IN TIME OPTIMIZATIONS ARE REDUNTANT.
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal Task<string> Random_Alphanumeric_Code_Generator()
         {
-
-            string generated_random_code = String.Empty;
-
-
-            for(int count = 0; count < 30; count++)
+            try
             {
-                int generated_number = random_number_generator.Next(0, 3);
-
-
-                switch (generated_number)
+                lock (random_code_builder)
                 {
-                    case 0:
-                        generated_random_code += symbols[random_number_generator.Next(0, symbols.Length)];
-                        break;
+                    random_code_builder.Clear();
+
+                    for (int count = 0; count < 30; count++)
+                    {
+                        int generated_number = random_number_generator.Next(0, 3);
 
 
-
-                    case 1:
-
-                        int generated_option = random_number_generator.Next(0, 2);
-
-                        switch (generated_option)
+                        switch (generated_number)
                         {
                             case 0:
-                                generated_random_code += letters[random_number_generator.Next(0, letters.Length)];
+                                random_code_builder.Append(symbols.ElementAt(random_number_generator.Next(0, symbols.Count)));
                                 break;
+
+
 
                             case 1:
-                                generated_random_code += letters[random_number_generator.Next(0, letters.Length)].ToString().ToLower();
+
+                                int generated_option = random_number_generator.Next(0, 2);
+
+                                switch (generated_option)
+                                {
+                                    case 0:
+                                        random_code_builder.Append(letters.ElementAt(random_number_generator.Next(0, letters.Count)));
+                                        break;
+
+                                    case 1:
+                                        random_code_builder.Append(letters.ElementAt(random_number_generator.Next(0, letters.Count)).ToString().ToLower());
+                                        break;
+                                }
+                                break;
+
+
+
+                            case 2:
+                                random_code_builder.Append(numbers.ElementAt(random_number_generator.Next(0, numbers.Count)));
                                 break;
                         }
-                        break;
-
-
-
-                    case 2:
-                        generated_random_code += numbers[random_number_generator.Next(0, numbers.Length)];
-                        break;
+                    }
                 }
             }
+            catch (Exception E)
+            {
 
-            return Task.FromResult(generated_random_code);
+            }
+
+            return Task.FromResult(random_code_builder.ToString());
+            
         }
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -332,7 +440,7 @@ namespace Omega_Drive_Server
 
 
 
-            if (content.GetType() == extracted_content.GetType())
+            if (content.GetType() == typeof(byte[]))
             {
                 extracted_content = content as byte[];
             }
@@ -355,7 +463,7 @@ namespace Omega_Drive_Server
                 extracted_content = Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(extracted_content) + salt);
 
 
-                System.Security.Cryptography.SHA256 content_hasher = System.Security.Cryptography.SHA256.Create();
+                
 
                 try
                 {
@@ -366,7 +474,7 @@ namespace Omega_Drive_Server
                     {
                         hashed_content = Encoding.UTF8.GetString(await content_hasher.ComputeHashAsync(stream));
                     }
-                    catch
+                    catch(Exception E)
                     {
                         hashed_content = "Error occured";
 
@@ -384,22 +492,11 @@ namespace Omega_Drive_Server
                         }
                     }
                 }
-                catch
+                catch (Exception E)
                 {
-                    hashed_content = "Error occured";
+                    System.Diagnostics.Debug.WriteLine("Error: " + E.Message);
 
-                    if (content_hasher != null)
-                    {
-                        content_hasher.Clear();
-                    }
-                }
-                finally
-                {
-                    if (content_hasher != null)
-                    {
-                        content_hasher.Clear();
-                        content_hasher.Dispose();
-                    }
+                    hashed_content = "Error occured";
                 }
             }
 

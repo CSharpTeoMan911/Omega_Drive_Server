@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Drawing;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,7 +14,6 @@ namespace Omega_Drive_Server
     class Client_Connections:Server_Application_Variables
     {
         private byte[] server_response = Encoding.UTF8.GetBytes("OK");
-        private byte[] client_response = new byte[Encoding.UTF8.GetBytes("OK").Length];
 
 
         private Server_Function_Selector server_function_selector = new Server_Function_Selector();
@@ -29,7 +29,7 @@ namespace Omega_Drive_Server
                 client.ReceiveTimeout = 1000;
 
 
-
+                int buffer_length = 0;
 
                 System.Net.Sockets.NetworkStream client_network_stream = new System.Net.Sockets.NetworkStream(client);
 
@@ -47,20 +47,22 @@ namespace Omega_Drive_Server
                         if(bytes_per_second > 0)
                         {
                             byte[] client_payload_size_buffer = new byte[1024];
+                            buffer_length = client_payload_size_buffer.Length;
 
-                            await Calculate_Timeout(client, client_payload_size_buffer.Length, bytes_per_second);
+                            await Calculate_Timeout(client, ref buffer_length, ref bytes_per_second);
 
-                            await client_secure_socket_layer_stream.ReadAsync(client_payload_size_buffer, 0, client_payload_size_buffer.Length);
+                            await client_secure_socket_layer_stream.ReadAsync(client_payload_size_buffer, 0, buffer_length);
 
                             await client_secure_socket_layer_stream.FlushAsync();
 
 
 
 
+                            buffer_length = server_response.Length;
 
-                            await Calculate_Timeout(client, server_response.Length, bytes_per_second);
+                            await Calculate_Timeout(client, ref buffer_length, ref bytes_per_second);
 
-                            await client_secure_socket_layer_stream.WriteAsync(server_response, 0, server_response.Length);
+                            await client_secure_socket_layer_stream.WriteAsync(server_response, 0, buffer_length);
 
                             await client_secure_socket_layer_stream.FlushAsync();
 
@@ -70,13 +72,15 @@ namespace Omega_Drive_Server
 
                             byte[] client_payload_buffer = new byte[BitConverter.ToInt32(client_payload_size_buffer, 0)];
 
-                            await Calculate_Timeout(client, client_payload_buffer.Length, bytes_per_second);
+                            buffer_length = client_payload_buffer.Length;
+
+                            await Calculate_Timeout(client, ref buffer_length, ref bytes_per_second);
 
                             int total_bytes_read = 0;
 
                             while (total_bytes_read < client_payload_buffer.Length)
                             {
-                                total_bytes_read += await client_secure_socket_layer_stream.ReadAsync(client_payload_buffer, total_bytes_read, client_payload_buffer.Length - total_bytes_read);
+                                total_bytes_read += await client_secure_socket_layer_stream.ReadAsync(client_payload_buffer, total_bytes_read, buffer_length - total_bytes_read);
                             }
 
 
@@ -102,9 +106,11 @@ namespace Omega_Drive_Server
 
                             byte[] server_payload_length = BitConverter.GetBytes(server_payload.Length);
 
-                            await Calculate_Timeout(client, server_payload_length.Length, bytes_per_second);
+                            buffer_length = server_payload_length.Length;
 
-                            await client_secure_socket_layer_stream.WriteAsync(server_payload_length, 0, server_payload_length.Length);
+                            await Calculate_Timeout(client, ref buffer_length, ref bytes_per_second);
+
+                            await client_secure_socket_layer_stream.WriteAsync(server_payload_length, 0, buffer_length);
 
                             await client_secure_socket_layer_stream.FlushAsync();
 
@@ -112,7 +118,13 @@ namespace Omega_Drive_Server
 
 
 
-                            await Calculate_Timeout(client, client_response.Length, bytes_per_second);
+
+
+                            byte[] client_response = new byte[Encoding.UTF8.GetBytes("OK").Length];
+
+                            buffer_length = client_response.Length;
+
+                            await Calculate_Timeout(client, ref buffer_length, ref bytes_per_second);
 
                             await client_secure_socket_layer_stream.ReadAsync(client_response, 0, client_response.Length);
 
@@ -124,9 +136,11 @@ namespace Omega_Drive_Server
 
 
 
-                            await Calculate_Timeout(client, server_payload.Length, bytes_per_second);
+                            buffer_length = server_payload.Length;
 
-                            await client_secure_socket_layer_stream.WriteAsync(server_payload, 0, server_payload.Length);
+                            await Calculate_Timeout(client, ref buffer_length, ref bytes_per_second);
+
+                            await client_secure_socket_layer_stream.WriteAsync(server_payload, 0, buffer_length);
 
                             await client_secure_socket_layer_stream.FlushAsync();
                         }
@@ -261,7 +275,9 @@ namespace Omega_Drive_Server
         }
 
 
-        private Task<bool> Calculate_Timeout(System.Net.Sockets.Socket client, int payload_size, int bytes_per_second)
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private Task<bool> Calculate_Timeout(System.Net.Sockets.Socket client, ref int payload_size, ref int bytes_per_second)
         {
             client.SendBufferSize = payload_size / bytes_per_second + 1000;
             client.ReceiveBufferSize = payload_size / bytes_per_second + 1000;

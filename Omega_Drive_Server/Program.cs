@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BenchmarkDotNet.Running;
+using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,7 +45,6 @@ namespace Omega_Drive_Server
 
 
         x509_Certificate_Generation:
-
             bool server_certificate_load_up_successful = await server_cryptographic_functions.Load_Server_Certificate_In_Application_Memory();
 
             if (server_certificate_load_up_successful == false)
@@ -208,6 +209,7 @@ namespace Omega_Drive_Server
                 {
                     bool x509_Certificate_Generation_Result_Is_Successful = await Generate_X509_Certificate();
 
+                    
                     if (x509_Certificate_Generation_Result_Is_Successful == true)
                     {
                         Server_Application_GUI.X509_Certificate_Generation_Successful();
@@ -216,6 +218,7 @@ namespace Omega_Drive_Server
                     {
                         Server_Application_GUI.X509_Certificate_Generation_Unsuccessful();
                     }
+                    
 
                     Console.ReadLine();
 
@@ -245,7 +248,7 @@ namespace Omega_Drive_Server
 
 
 
-        private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        private static async void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
             if(server_certificate != null)
             {
@@ -262,6 +265,7 @@ namespace Omega_Drive_Server
             {
                 if (server_socket.Connected == true)
                 {
+                    await server_socket.DisconnectAsync(true, System.Threading.CancellationToken.None);
                     server_socket.Shutdown(System.Net.Sockets.SocketShutdown.Both);
                 }
                 server_socket.Close();
@@ -269,11 +273,17 @@ namespace Omega_Drive_Server
             }
         }
 
+
+
         private static void Server_functionality_timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             
         }
 
+
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static async void Server_Operation()
         {
             try
@@ -299,6 +309,9 @@ namespace Omega_Drive_Server
                 System.Diagnostics.Debug.WriteLine(E.Message);
             }
         }
+
+
+
 
 
 
@@ -534,6 +547,9 @@ namespace Omega_Drive_Server
         }
 
 
+
+
+
         private static async Task<bool> Set_MySQL_Database_Connection()
         {
             bool invalid_credentials = false;
@@ -605,6 +621,12 @@ namespace Omega_Drive_Server
 
             return true;
         }
+
+
+
+
+
+
 
 
         private static async Task<bool> Generate_X509_Certificate()
