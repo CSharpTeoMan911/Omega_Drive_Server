@@ -277,7 +277,47 @@ namespace Omega_Drive_Server
 
         private static void Server_functionality_timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            
+
+            // SET THE APPLICATION'S DEFAULT THREAD POOL MAXIMUM SIZE IF THE NUMBER OF AVAILABLE
+            // THREADS WITHIN THE THREAD POOL IS LESS THAN 1000. THE THREAD POOL IS USED BY 
+            // ASYNCHRONOUS TASKS AND THESE THREADS ARE THREADS WITHOUT CERTAIN SET 
+            // CHARACTERISTICS, LIKE PRIORITY, BACKGROUND OPERATION, FOREGROUND
+            // OPERATION, OR APARTMENT STATE.
+            //
+            // [ BEGIN ]
+
+            int max_worker_threads = 0;
+            int max_port_threads = 0;
+
+            int current_available_worker_threads = 0;
+            int current_available_port_threads = 0;
+
+            System.Threading.ThreadPool.GetMaxThreads(out max_worker_threads, out max_port_threads);
+            System.Threading.ThreadPool.GetAvailableThreads(out current_available_worker_threads, out current_available_port_threads);
+
+            if(current_available_worker_threads < 1000)
+            {
+                System.Threading.ThreadPool.SetMaxThreads(max_worker_threads + 1000, max_port_threads);
+            }
+            else
+            {
+                System.Threading.ThreadPool.SetMaxThreads(max_worker_threads - (current_available_worker_threads - 1000), max_port_threads);
+            }
+
+
+            if (current_available_port_threads < 1000)
+            {
+                System.Threading.ThreadPool.SetMaxThreads(max_worker_threads, max_port_threads + 1000);
+            }
+            else
+            {
+                System.Threading.ThreadPool.SetMaxThreads(max_worker_threads, max_port_threads - (current_available_port_threads - 1000));
+            }
+
+            // [ END ]
+
+
+
         }
 
 

@@ -148,6 +148,9 @@ namespace Omega_Drive_Server
                     }
                     catch (Exception E)
                     {
+                        System.Diagnostics.Debug.WriteLine("Error: " + E.Message);
+                        System.Diagnostics.Debug.WriteLine("Error source: " + E.Source);
+
                         if (client_secure_socket_layer_stream != null)
                         {
                             client_secure_socket_layer_stream.Close();
@@ -164,6 +167,8 @@ namespace Omega_Drive_Server
                 }
                 catch (Exception E)
                 {
+                    System.Diagnostics.Debug.WriteLine("Error: " + E.Message);
+
                     if (client_network_stream != null)
                     {
                         client_network_stream.Close();
@@ -180,6 +185,8 @@ namespace Omega_Drive_Server
             }
             catch (Exception E)
             {
+                System.Diagnostics.Debug.WriteLine("Error: " + E.Message);
+
                 if (client != null)
                 {
                     client.Close();
