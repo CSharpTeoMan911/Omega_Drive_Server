@@ -17,6 +17,8 @@ namespace Omega_Drive_Server
 
 
         private Server_Function_Selector server_function_selector = new Server_Function_Selector();
+        private Payload_Serialization payload_Serialization = new Payload_Serialization();
+
 
 
         internal async Task<bool> Secure_Client_Connection(System.Net.Sockets.Socket client)
@@ -39,13 +41,19 @@ namespace Omega_Drive_Server
 
                     try
                     {
-                        client_secure_socket_layer_stream.AuthenticateAsServer(server_certificate, false, connection_ssl_protocol, false);
+                        lock(server_certificate)
+                        {
+                            client_secure_socket_layer_stream.AuthenticateAsServer(server_certificate, false, connection_ssl_protocol, false);
+                        }
+
 
                         int bytes_per_second = await Connection_Speed_Calculator(((IPEndPoint)client.RemoteEndPoint).Address, client_secure_socket_layer_stream);
 
 
+
                         if(bytes_per_second > 0)
                         {
+
                             byte[] client_payload_size_buffer = new byte[1024];
                             buffer_length = client_payload_size_buffer.Length;
 
@@ -90,9 +98,7 @@ namespace Omega_Drive_Server
 
 
 
-                            Payload_Serialization payload_Serialization = new Payload_Serialization();
                             Client_WSDL_Payload client_WSDL_Payload = await payload_Serialization.Deserialize_Payload(client_payload_buffer);
-
 
                             byte[] server_payload = await server_function_selector.Server_Function_Selection(client_WSDL_Payload);
 
@@ -148,9 +154,6 @@ namespace Omega_Drive_Server
                     }
                     catch (Exception E)
                     {
-                        System.Diagnostics.Debug.WriteLine("Error: " + E.Message);
-                        System.Diagnostics.Debug.WriteLine("Error source: " + E.Source);
-
                         if (client_secure_socket_layer_stream != null)
                         {
                             client_secure_socket_layer_stream.Close();
@@ -167,8 +170,6 @@ namespace Omega_Drive_Server
                 }
                 catch (Exception E)
                 {
-                    System.Diagnostics.Debug.WriteLine("Error: " + E.Message);
-
                     if (client_network_stream != null)
                     {
                         client_network_stream.Close();
@@ -185,8 +186,6 @@ namespace Omega_Drive_Server
             }
             catch (Exception E)
             {
-                System.Diagnostics.Debug.WriteLine("Error: " + E.Message);
-
                 if (client != null)
                 {
                     client.Close();
@@ -280,6 +279,7 @@ namespace Omega_Drive_Server
 
             return bytes_per_second;
         }
+
 
 
 

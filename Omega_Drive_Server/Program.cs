@@ -3,6 +3,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.ConstrainedExecution;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Omega_Drive_Server
@@ -11,9 +12,6 @@ namespace Omega_Drive_Server
     {
         private static Client_Connections client_connections = new Client_Connections();
         private static Server_Cryptographic_Functions server_cryptographic_functions = new Server_Cryptographic_Functions();
-
-        private static System.Threading.Thread server_socket_thread;
-
 
 
         static void Main(string[] args)
@@ -89,20 +87,20 @@ namespace Omega_Drive_Server
                 {
                     server_opened = true;
 
-                    System.Threading.Thread client_connection_thread = new System.Threading.Thread(() =>
+                    System.Threading.Thread server_operation_thread = new System.Threading.Thread(() =>
                     {
                         Server_Operation();
                     });
 
                     if (OperatingSystem.IsWindows() == true)
                     {
-                        #pragma warning disable CA1416 // Validate platform compatibility
-                        client_connection_thread.SetApartmentState(System.Threading.ApartmentState.MTA);
+#pragma warning disable CA1416 // Validate platform compatibility
+                        server_operation_thread.SetApartmentState(System.Threading.ApartmentState.MTA);
                         #pragma warning restore CA1416 // Validate platform compatibility
                     }
-                    client_connection_thread.Priority = System.Threading.ThreadPriority.Highest;
-                    client_connection_thread.IsBackground = false;
-                    client_connection_thread.Start();
+                    server_operation_thread.Priority = System.Threading.ThreadPriority.Highest;
+                    server_operation_thread.IsBackground = false;
+                    server_operation_thread.Start();
 
                     goto Main_Menu;
                 }
@@ -332,11 +330,9 @@ namespace Omega_Drive_Server
 
                 while (true)
                 {
-                    System.Net.Sockets.Socket client = server_socket.Accept();
-
                     if(server_opened == true)
                     {
-                        await client_connections.Secure_Client_Connection(client);
+                        await client_connections.Secure_Client_Connection(server_socket.Accept());
                     }
                     else
                     {

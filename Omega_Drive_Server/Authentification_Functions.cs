@@ -29,7 +29,7 @@ namespace Omega_Drive_Server
 
 
 
-            if (Encoding.UTF8.GetString(client_WSDL_Payload.Password___Or___Binary_Content).Length >= 6)
+            if (Encoding.UTF8.GetString(client_WSDL_Payload.Password___Or___Binary_Content___Or___Log_In_Code).Length >= 6)
             {
 
                 try
@@ -43,7 +43,7 @@ namespace Omega_Drive_Server
                 }
 
 
-                string password_hashing_result = await Server_Cryptographic_Functions.Content_Hasher<byte[]>(client_WSDL_Payload.Password___Or___Binary_Content);
+                string password_hashing_result = await Server_Cryptographic_Functions.Content_Hasher<byte[]>(client_WSDL_Payload.Password___Or___Binary_Content___Or___Log_In_Code);
 
 
 
@@ -405,7 +405,7 @@ namespace Omega_Drive_Server
 
             try
             {
-                verify_user_credentials_command.Parameters.AddWithValue("user_password", await Server_Cryptographic_Functions.Content_Hasher<byte[]>(client_WSDL_Payload.Password___Or___Binary_Content));
+                verify_user_credentials_command.Parameters.AddWithValue("user_password", await Server_Cryptographic_Functions.Content_Hasher<byte[]>(client_WSDL_Payload.Password___Or___Binary_Content___Or___Log_In_Code));
 
                 MySqlConnector.MySqlDataReader verify_user_credentials_command_reader = await verify_user_credentials_command.ExecuteReaderAsync();
 
@@ -585,5 +585,78 @@ namespace Omega_Drive_Server
         Log_In_Error:
             return log_in_account_result;
         }
+
+
+
+
+
+
+
+
+        internal async Task<byte[]> Authentificate_Account(MySqlConnector.MySqlConnection connection, Client_WSDL_Payload client_WSDL_Payload)
+        {
+            byte[] authentificate_account_result = connection_failed_message;
+
+            MySqlConnector.MySqlCommand authentificate_user_command = new MySqlConnector.MySqlCommand("DELETE FROM pending_log_in_sessions WHERE one_time_log_in_session_code = @one_time_log_in_session_code;", connection);
+
+            try
+            {
+                authentificate_user_command.Parameters.AddWithValue("one_time_log_in_session_code", Encoding.UTF8.GetString(client_WSDL_Payload.Password___Or___Binary_Content___Or___Log_In_Code));
+                await authentificate_user_command.ExecuteNonQueryAsync();
+            }
+            catch
+            {
+                if(authentificate_user_command != null)
+                {
+                    await authentificate_user_command.DisposeAsync();
+                }
+
+                authentificate_account_result = invalid_log_in_code;
+
+                goto Authentification_Error;
+            }
+            finally
+            {
+                if (authentificate_user_command != null)
+                {
+                    await authentificate_user_command.DisposeAsync();
+                }
+            }
+
+
+
+            string code = await Server_Cryptographic_Functions.Random_Alphanumeric_Code_Generator();
+            string code_hashing_result = await Server_Cryptographic_Functions.Content_Hasher<string>(code);
+
+
+            if (code_hashing_result != "Error occured")
+            {
+                MySqlConnector.MySqlCommand log_in_key_insertion_command = new MySqlConnector.MySqlCommand("INSERT INTO active_log_in_sessions VALUES(@log_in_session_key, @user_email, NOW() + INTERVAL 42 HOUR);", connection);
+
+                try
+                {
+                    log_in_key_insertion_command.Parameters.AddWithValue("log_in_session_key", code_hashing_result);
+                    log_in_key_insertion_command.Parameters.AddWithValue("user_email", client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key);
+                }
+                catch
+                {
+                    if (log_in_key_insertion_command != null)
+                    {
+                        await log_in_key_insertion_command.DisposeAsync();
+                    }
+                }
+                finally
+                {
+                    if (log_in_key_insertion_command != null)
+                    {
+                        await log_in_key_insertion_command.DisposeAsync();
+                    }
+                }
+            }
+
+        Authentification_Error:
+            return authentificate_account_result;
+        }
+
     }
 }

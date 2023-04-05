@@ -14,7 +14,7 @@ namespace Omega_Drive_Server
 
         internal async Task<byte[]> Server_Function_Selection(Client_WSDL_Payload payload)
         {
-            byte[] function_payload = Encoding.UTF8.GetBytes("Connection error");
+            byte[] function_payload = connection_failed_message;
 
             
             MySqlConnector.MySqlConnection connection = new MySqlConnector.MySqlConnection("Server = " + my_sql_database_server +"; User ID = " + my_sql_database_username + "; Password = " + my_sql_database_password + "; Database = " + my_sql_database_database_name);
@@ -39,6 +39,7 @@ namespace Omega_Drive_Server
                         break;
 
                     case "Account authentification":
+                        
                         break;
                 }
             }
