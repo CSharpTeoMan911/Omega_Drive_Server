@@ -71,7 +71,7 @@ namespace Omega_Drive_Server
 
             server_functionality_timer = new System.Timers.Timer();
             server_functionality_timer.Elapsed += Server_functionality_timer_Elapsed;
-            server_functionality_timer.Interval = 100;
+            server_functionality_timer.Interval = 10000;
             server_functionality_timer.Start();
 
             System.AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
@@ -246,9 +246,11 @@ namespace Omega_Drive_Server
 
 
 
-        private static async void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
-            if(server_certificate != null)
+            server_opened = false;
+
+            if (server_certificate != null)
             {
                 server_certificate.Dispose();
             }
@@ -261,62 +263,70 @@ namespace Omega_Drive_Server
 
             if(server_socket != null)
             {
-                if (server_socket.Connected == true)
-                {
-                    await server_socket.DisconnectAsync(true, System.Threading.CancellationToken.None);
-                    server_socket.Shutdown(System.Net.Sockets.SocketShutdown.Both);
-                }
-                server_socket.Close();
                 server_socket.Dispose();
             }
         }
 
 
 
-        private static void Server_functionality_timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private static async void Server_functionality_timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-
-            // SET THE APPLICATION'S DEFAULT THREAD POOL MAXIMUM SIZE IF THE NUMBER OF AVAILABLE
-            // THREADS WITHIN THE THREAD POOL IS LESS THAN 1000. THE THREAD POOL IS USED BY 
-            // ASYNCHRONOUS TASKS AND THESE THREADS ARE THREADS WITHOUT CERTAIN SET 
-            // CHARACTERISTICS, LIKE PRIORITY, BACKGROUND OPERATION, FOREGROUND
-            // OPERATION, OR APARTMENT STATE.
-            //
-            // [ BEGIN ]
-
-            int max_worker_threads = 0;
-            int max_port_threads = 0;
-
-            int current_available_worker_threads = 0;
-            int current_available_port_threads = 0;
-
-            System.Threading.ThreadPool.GetMaxThreads(out max_worker_threads, out max_port_threads);
-            System.Threading.ThreadPool.GetAvailableThreads(out current_available_worker_threads, out current_available_port_threads);
-
-            if(current_available_worker_threads < 1000)
+            if(server_opened == true)
             {
-                System.Threading.ThreadPool.SetMaxThreads(max_worker_threads + 1000, max_port_threads);
+                // SET THE APPLICATION'S DEFAULT THREAD POOL MAXIMUM SIZE IF THE NUMBER OF AVAILABLE
+                // THREADS WITHIN THE THREAD POOL IS LESS THAN 1000. THE THREAD POOL IS USED BY 
+                // ASYNCHRONOUS TASKS AND THESE THREADS ARE THREADS WITHOUT CERTAIN SET 
+                // CHARACTERISTICS, LIKE PRIORITY, BACKGROUND OPERATION, FOREGROUND
+                // OPERATION, OR APARTMENT STATE.
+                //
+                // [ BEGIN ]
+
+                int max_worker_threads = 0;
+                int max_port_threads = 0;
+
+                int current_available_worker_threads = 0;
+                int current_available_port_threads = 0;
+
+                System.Threading.ThreadPool.GetMaxThreads(out max_worker_threads, out max_port_threads);
+                System.Threading.ThreadPool.GetAvailableThreads(out current_available_worker_threads, out current_available_port_threads);
+
+                if (current_available_worker_threads < 1000)
+                {
+                    System.Threading.ThreadPool.SetMaxThreads(max_worker_threads + 1000, max_port_threads);
+                }
+                else
+                {
+                    System.Threading.ThreadPool.SetMaxThreads(max_worker_threads - (current_available_worker_threads - 1000), max_port_threads);
+                }
+
+
+                if (current_available_port_threads < 1000)
+                {
+                    System.Threading.ThreadPool.SetMaxThreads(max_worker_threads, max_port_threads + 1000);
+                }
+                else
+                {
+                    System.Threading.ThreadPool.SetMaxThreads(max_worker_threads, max_port_threads - (current_available_port_threads - 1000));
+                }
+
+                // [ END ]
+
+
+                await Delete_Expired_Database_Items();
             }
-            else
-            {
-                System.Threading.ThreadPool.SetMaxThreads(max_worker_threads - (current_available_worker_threads - 1000), max_port_threads);
-            }
-
-
-            if (current_available_port_threads < 1000)
-            {
-                System.Threading.ThreadPool.SetMaxThreads(max_worker_threads, max_port_threads + 1000);
-            }
-            else
-            {
-                System.Threading.ThreadPool.SetMaxThreads(max_worker_threads, max_port_threads - (current_available_port_threads - 1000));
-            }
-
-            // [ END ]
-
-
-
         }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -442,7 +452,6 @@ namespace Omega_Drive_Server
                     }
 
                     Server_Application_GUI.SMTPS_Service_Password_Setup();
-
                     string smtps_password = Console.ReadLine();
 
                     if (smtps_password != "E")
@@ -692,20 +701,23 @@ namespace Omega_Drive_Server
                     }
 
 
-                    x509_Certificate_Generation_Result_Is_Successful = await server_cryptographic_functions.Create_X509_Server_Certificate(certificate_password, certificate_valid_time_period);
+                    if(certificate_valid_time_period > 0)
+                    {
+                        x509_Certificate_Generation_Result_Is_Successful = await server_cryptographic_functions.Create_X509_Server_Certificate(certificate_password, certificate_valid_time_period);
 
-                    if (x509_Certificate_Generation_Result_Is_Successful == false)
-                    {
-                        await Generate_X509_Certificate();
-                    }
-                    else
-                    {
-                        lock (server_ssl_certificate_password)
+                        if (x509_Certificate_Generation_Result_Is_Successful == false)
                         {
-                            server_ssl_certificate_password = certificate_password;
+                            await Generate_X509_Certificate();
                         }
+                        else
+                        {
+                            lock (server_ssl_certificate_password)
+                            {
+                                server_ssl_certificate_password = certificate_password;
+                            }
 
-                        await Update_Server_Application_Settings_File();
+                            await Update_Server_Application_Settings_File();
+                        }
                     }
                 }
                 else

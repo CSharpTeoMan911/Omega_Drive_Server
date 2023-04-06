@@ -10,6 +10,6 @@ namespace Omega_Drive_Server
     {
         public string Function;
         public string Email___Or___Log_In_Session_Key___Or___Account_Validation_Key;
-        public byte[] Password___Or___Binary_Content___Or___Log_In_Code;
+        public byte[] Password___Or___Binary_Content;
     }
 }

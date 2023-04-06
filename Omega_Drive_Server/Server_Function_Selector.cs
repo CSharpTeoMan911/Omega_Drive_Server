@@ -39,7 +39,11 @@ namespace Omega_Drive_Server
                         break;
 
                     case "Account authentification":
-                        
+                        function_payload = await Authentification_Functions.Authentificate_Account(connection, payload);
+                        break;
+
+                    case "Verify log in session key":
+                        function_payload = await Authentification_Functions.Verify_Log_In_Session_Key(connection, payload);
                         break;
                 }
             }

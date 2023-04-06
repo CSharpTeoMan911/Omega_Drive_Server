@@ -9,7 +9,7 @@ namespace Omega_Drive_Server
 {
     class Server_Application_GUI:Server_Application_Variables
     {
-        internal static async void Main_Menu()
+        internal static void Main_Menu()
         {
             Console.Clear();
 
@@ -198,7 +198,7 @@ namespace Omega_Drive_Server
             Console.WriteLine("\t\t|||                     SSL protocol setup                 |||");
             Console.WriteLine("\t\t||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
             Console.WriteLine("\t\t|||                                                        |||");
-            Console.WriteLine("\t\t|||  SSL Protocol: " + available_connection_ssl_protocol[current_connection_ssl_protocol] + "                                   |||");
+            Console.WriteLine("\t\t|||  SSL Protocol: " + ((Server_Application_Variables.SslProtocol)current_connection_ssl_protocol).ToString() + "                                   |||");
             Console.WriteLine("\t\t|||                                                        |||");
             Console.WriteLine("\t\t|||  [ N ] Next protocol                                   |||");
             Console.WriteLine("\t\t|||                                                        |||");

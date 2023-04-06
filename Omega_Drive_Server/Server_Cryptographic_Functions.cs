@@ -49,7 +49,6 @@ namespace Omega_Drive_Server
         // [ BEGIN ]
 
         private static string salt = "dafjlsk";
-        private static System.Random random_number_generator = new Random();
 
 
         private static List<char> symbols = new List<char> { '¬', '`', '¦', '!', '"', '£', '$', '%', '^', '&', '*', '(', ')', '€', '-', '_', '=', '+', '[', '{', ']', '}', ';', ':', '\'', '@', '#', '~', ',', '<', '.', '>', '/', '?', '|', '\\' };
@@ -370,29 +369,29 @@ namespace Omega_Drive_Server
 
                     for (int count = 0; count < 30; count++)
                     {
-                        int generated_number = random_number_generator.Next(0, 3);
+                        int generated_number = System.Security.Cryptography.RandomNumberGenerator.GetInt32(0, 3);
 
 
                         switch (generated_number)
                         {
                             case 0:
-                                random_code_builder.Append(symbols.ElementAt(random_number_generator.Next(0, symbols.Count)));
+                                random_code_builder.Append(symbols.ElementAt(System.Security.Cryptography.RandomNumberGenerator.GetInt32(0, symbols.Count)));
                                 break;
 
 
 
                             case 1:
 
-                                int generated_option = random_number_generator.Next(0, 2);
+                                int generated_option = System.Security.Cryptography.RandomNumberGenerator.GetInt32(0, 2);
 
                                 switch (generated_option)
                                 {
                                     case 0:
-                                        random_code_builder.Append(letters.ElementAt(random_number_generator.Next(0, letters.Count)));
+                                        random_code_builder.Append(letters.ElementAt(System.Security.Cryptography.RandomNumberGenerator.GetInt32(0, letters.Count)));
                                         break;
 
                                     case 1:
-                                        random_code_builder.Append(letters.ElementAt(random_number_generator.Next(0, letters.Count)).ToString().ToLower());
+                                        random_code_builder.Append(letters.ElementAt(System.Security.Cryptography.RandomNumberGenerator.GetInt32(0, letters.Count)).ToString().ToLower());
                                         break;
                                 }
                                 break;
@@ -400,7 +399,7 @@ namespace Omega_Drive_Server
 
 
                             case 2:
-                                random_code_builder.Append(numbers.ElementAt(random_number_generator.Next(0, numbers.Count)));
+                                random_code_builder.Append(letters.ElementAt(System.Security.Cryptography.RandomNumberGenerator.GetInt32(0, numbers.Count)));
                                 break;
                         }
                     }
@@ -450,7 +449,7 @@ namespace Omega_Drive_Server
             }
             else
             {
-                hashed_content = "Error occured";
+                hashed_content = content_hashing_error;
             }
 
 
@@ -458,7 +457,7 @@ namespace Omega_Drive_Server
 
 
 
-            if(hashed_content != "Error occured")
+            if(hashed_content != content_hashing_error)
             {
                 extracted_content = Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(extracted_content) + salt);
 
@@ -476,7 +475,7 @@ namespace Omega_Drive_Server
                     }
                     catch(Exception E)
                     {
-                        hashed_content = "Error occured";
+                        hashed_content = content_hashing_error;
 
                         if (stream != null)
                         {
@@ -494,9 +493,7 @@ namespace Omega_Drive_Server
                 }
                 catch (Exception E)
                 {
-                    System.Diagnostics.Debug.WriteLine("Error: " + E.Message);
-
-                    hashed_content = "Error occured";
+                    hashed_content = content_hashing_error;
                 }
             }
 

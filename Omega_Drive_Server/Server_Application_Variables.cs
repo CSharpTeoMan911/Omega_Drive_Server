@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,7 +25,10 @@ namespace Omega_Drive_Server
         protected static byte[] invalid_log_in_code = Encoding.UTF8.GetBytes("Invalid log in code");
         protected static byte[] account_validation_successful = Encoding.UTF8.GetBytes("Account validation successful");
         protected static byte[] invalid_password_length = Encoding.UTF8.GetBytes("Invalid password length");
-
+        protected static byte[] account_authentification_successful = Encoding.UTF8.GetBytes("Account authentification successful");
+        protected static byte[] log_in_session_key_valid = Encoding.UTF8.GetBytes("Log in session key is valid");
+        protected static byte[] log_in_session_key_invalid = Encoding.UTF8.GetBytes("Log in session key is invalid");
+        protected static string content_hashing_error = "Error occured";
         // [ END ]
 
 
@@ -57,7 +61,14 @@ namespace Omega_Drive_Server
         protected static System.Security.Cryptography.X509Certificates.X509Certificate2 server_certificate;
         protected static string server_ssl_certificate_password = String.Empty;
         protected static System.Security.Authentication.SslProtocols connection_ssl_protocol = System.Security.Authentication.SslProtocols.Tls13;
-        protected static List<string> available_connection_ssl_protocol = new List<string>() { "Tls13", "Tls12" };
+
+
+        protected static readonly Dictionary<string, string> smtps_provider_and_server = new Dictionary<string, string>()
+        {
+            { "Google", "smtp.gmail.com" },
+            { "Microsoft", "smtp-mail.outlook.com" }
+        };
+
         protected static int current_connection_ssl_protocol = 0;
 
 
@@ -81,13 +92,19 @@ namespace Omega_Drive_Server
 
 
 
+        internal enum SslProtocol
+        {
+            Tls13 = 0,
+            Tls12 = 1
+        }
+
 
 
 
         // SETS THE SSL PROTOCOL THAT IS USED BY THE SERVER DURING ANY CONNECTION INITIATED WITH ANY CLIENT
-        protected static Task<bool> SSL_Protocol_Selection()
+        protected static Task<bool> Get_And_Set_SSL_Protocol()
         {
-            if (available_connection_ssl_protocol[current_connection_ssl_protocol] == "Tls13")
+            if (current_connection_ssl_protocol == (int)SslProtocol.Tls13)
             {
                 connection_ssl_protocol = System.Security.Authentication.SslProtocols.Tls13;
             }
@@ -156,7 +173,7 @@ namespace Omega_Drive_Server
                 }
             }
 
-            await SSL_Protocol_Selection();
+            await Get_And_Set_SSL_Protocol();
 
 
             byte[] json_serialised_server_application_settings = Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(settings, Newtonsoft.Json.Formatting.Indented));
@@ -259,7 +276,7 @@ namespace Omega_Drive_Server
                         }
                     }
 
-                    await SSL_Protocol_Selection();
+                    await Get_And_Set_SSL_Protocol();
 
 
                     server_settings_load_is_successful = true;
@@ -353,68 +370,56 @@ namespace Omega_Drive_Server
             bool smtps_operation_is_successful = true;
 
 
+            MailKit.Net.Smtp.SmtpClient client = new MailKit.Net.Smtp.SmtpClient();
             MimeKit.MimeMessage message = new MimeKit.MimeMessage();
 
             try
             {
-                message.From.Add(new MimeKit.MailboxAddress("Omega Drive", smtps_service_email_address));
-                message.To.Add(new MimeKit.MailboxAddress("User", user_email));
-                message.Subject = function + " code";
-                message.Body = new MimeKit.TextPart("plain") { Text = "One time " + function + " code: " + code };
-
-
-                MailKit.Net.Smtp.SmtpClient client = new MailKit.Net.Smtp.SmtpClient();
-
-                try
+                lock (smtps_service_email_address)
                 {
-                    string smtp_server = String.Empty;
-                    int smtp_server_port = 0;
-
-
-                    switch(smtps_service_provider_name)
+                    lock (smtps_service_email_password)
                     {
-                        case "Google":
-                            smtp_server = "smtp.gmail.com";
-                            smtp_server_port = 587;
-                            break;
-
-                        case "Microsoft":
-                            smtp_server = "smtp-mail.outlook.com";
-                            smtp_server_port = 465;
-                            break;
-                    }
+                        message.From.Add(new MimeKit.MailboxAddress("Omega Drive", smtps_service_email_address));
+                        message.To.Add(new MimeKit.MailboxAddress("User", user_email));
+                        message.Subject = function + " code";
+                        message.Body = new MimeKit.TextPart("plain") { Text = "One time " + function + " code: " + code };
 
 
-                    client.Connect(smtp_server, smtp_server_port, MailKit.Security.SecureSocketOptions.StartTls);
+                        string smtp_server = String.Empty;
+                        int smtp_server_port = 587;
 
-                    await client.AuthenticateAsync(smtps_service_email_address, smtps_service_email_password);
-                    await client.SendAsync(message);
-                    await client.DisconnectAsync(true);
+                        smtps_provider_and_server.TryGetValue(smtps_service_provider_name, out smtp_server);
 
-                }
-                catch (Exception E)
-                {
-                    smtps_operation_is_successful = false;
+                        client.Connect(smtp_server, smtp_server_port, MailKit.Security.SecureSocketOptions.StartTls);
 
-                    if (client != null)
-                    {
-                        await client.DisconnectAsync(true);
+                        client.Authenticate(smtps_service_email_address, smtps_service_email_password);
                     }
                 }
-                finally
-                {
-                    if (client != null)
-                    {
-                        client.Dispose();
-                    }
-                }
+                await client.SendAsync(message);
+                await client.DisconnectAsync(true);
+
             }
             catch (Exception E)
             {
                 smtps_operation_is_successful = false;
+
+                if (client != null)
+                {
+                    await client.DisconnectAsync(true);
+                }
+
+                if (message != null)
+                {
+                    message.Dispose();
+                }
             }
             finally
             {
+                if (client != null)
+                {
+                    client.Dispose();
+                }
+
                 if (message != null)
                 {
                     message.Dispose();
@@ -428,5 +433,99 @@ namespace Omega_Drive_Server
 
         // [ END ]
 
+
+
+
+
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected static async Task<bool> Delete_Expired_Database_Items()
+        {
+            MySqlConnector.MySqlConnection connection = new MySqlConnector.MySqlConnection(("Server=" + my_sql_database_server + ";" + "User ID=" + my_sql_database_username + ";" + "Password=" + my_sql_database_password + ";" + "Database=" + my_sql_database_database_name));
+
+            try
+            {
+                await connection.OpenAsync();
+
+                MySqlConnector.MySqlCommand delete_expired_accounts_pending_for_validation = new MySqlConnector.MySqlCommand("DELETE FROM accounts_pending_for_validation WHERE account_validation_expiry_date < NOW();", connection);
+
+                try
+                {
+                    await delete_expired_accounts_pending_for_validation.ExecuteNonQueryAsync();
+                }
+                catch (Exception E)
+                {
+
+                }
+                finally
+                {
+                    if (delete_expired_accounts_pending_for_validation != null)
+                    {
+                        await delete_expired_accounts_pending_for_validation.DisposeAsync();
+                    }
+                }
+
+
+
+
+                MySqlConnector.MySqlCommand delete_expired_pending_log_in_sessions = new MySqlConnector.MySqlCommand("DELETE FROM pending_log_in_sessions WHERE log_in_session_request_expiry_date < NOW();", connection);
+
+                try
+                {
+                    await delete_expired_pending_log_in_sessions.ExecuteNonQueryAsync();
+                }
+                catch (Exception E)
+                {
+
+                }
+                finally
+                {
+                    if (delete_expired_pending_log_in_sessions != null)
+                    {
+                        await delete_expired_pending_log_in_sessions.DisposeAsync();
+                    }
+                }
+
+
+
+
+                MySqlConnector.MySqlCommand delete_expired_active_log_in_sessions = new MySqlConnector.MySqlCommand("DELETE FROM active_log_in_sessions WHERE active_log_in_session_expiry_date < NOW();", connection);
+
+                try
+                {
+                    await delete_expired_active_log_in_sessions.ExecuteNonQueryAsync();
+                }
+                catch (Exception E)
+                {
+
+                }
+                finally
+                {
+                    if (delete_expired_active_log_in_sessions != null)
+                    {
+                        await delete_expired_active_log_in_sessions.DisposeAsync();
+                    }
+                }
+
+            }
+            catch (Exception E)
+            {
+                if (connection != null)
+                {
+                    await connection.CloseAsync();
+                }
+            }
+            finally
+            {
+                if (connection != null)
+                {
+                    await connection.CloseAsync();
+                    await connection.DisposeAsync();
+                }
+            }
+
+            return true;
+        }
     }
 }
