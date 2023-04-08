@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Omega_Drive_Server": {
+      "commandName": "Project"
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    }
+  }
+}
