@@ -38,6 +38,10 @@ namespace Omega_Drive_Server
                         function_payload = await Authentification_Functions.Log_In_Account(connection, payload);
                         break;
 
+                    case "Log out":
+                        function_payload = await Authentification_Functions.Log_Out_Account(connection, payload);
+                        break;
+
                     case "Account authentification":
                         function_payload = await Authentification_Functions.Authentificate_Account(connection, payload);
                         break;

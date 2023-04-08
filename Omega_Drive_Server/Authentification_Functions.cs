@@ -735,7 +735,7 @@ namespace Omega_Drive_Server
                         log_in_key_insertion_command.Parameters.AddWithValue("user_email", user_email);
                         await log_in_key_insertion_command.ExecuteNonQueryAsync();
 
-                        authentificate_account_result = Encoding.UTF8.GetBytes(code_hashing_result);
+                        authentificate_account_result = Encoding.UTF8.GetBytes(code);
                     }
                     catch
                     {
@@ -762,58 +762,97 @@ namespace Omega_Drive_Server
 
 
 
+
         internal async Task<byte[]> Verify_Log_In_Session_Key(MySqlConnector.MySqlConnection connection, Client_WSDL_Payload client_WSDL_Payload)
         {
             byte[] log_in_session_key_verification_result = connection_failed_message;
 
+            string log_in_session_key_hashing__result = await Server_Cryptographic_Functions.Content_Hasher<string>(client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key);
 
 
-            MySqlConnector.MySqlCommand verify_if_log_in_session_key_is_valid_command = new MySqlConnector.MySqlCommand("SELECT FROM active_log_in_sessions WHERE log_in_session_key = @log_in_session_key;", connection);
-
-            try
+            if(log_in_session_key_hashing__result != content_hashing_error)
             {
-                verify_if_log_in_session_key_is_valid_command.Parameters.AddWithValue("log_in_session_key", client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key);
-
-                MySqlConnector.MySqlDataReader verify_if_log_in_session_key_is_valid_command_reader = await verify_if_log_in_session_key_is_valid_command.ExecuteReaderAsync();
+                MySqlConnector.MySqlCommand verify_if_log_in_session_key_is_valid_command = new MySqlConnector.MySqlCommand("SELECT log_in_session_key FROM active_log_in_sessions WHERE log_in_session_key = @log_in_session_key;", connection);
 
                 try
                 {
-                    if (await verify_if_log_in_session_key_is_valid_command_reader.ReadAsync() == true)
+                    verify_if_log_in_session_key_is_valid_command.Parameters.AddWithValue("log_in_session_key", log_in_session_key_hashing__result);
+
+                    MySqlConnector.MySqlDataReader verify_if_log_in_session_key_is_valid_command_reader = await verify_if_log_in_session_key_is_valid_command.ExecuteReaderAsync();
+
+                    try
                     {
-                        log_in_session_key_verification_result = log_in_session_key_valid;
+                        if (await verify_if_log_in_session_key_is_valid_command_reader.ReadAsync() == true)
+                        {
+                            log_in_session_key_verification_result = log_in_session_key_valid;
+                        }
+                        else
+                        {
+                            log_in_session_key_verification_result = log_in_session_key_invalid;
+                        }
                     }
-                    else
+                    catch (Exception E)
                     {
                         log_in_session_key_verification_result = log_in_session_key_invalid;
                     }
+                    finally
+                    {
+                        if (verify_if_log_in_session_key_is_valid_command != null)
+                        {
+                            await verify_if_log_in_session_key_is_valid_command.DisposeAsync();
+                        }
+                    }
+
                 }
-                catch
+                catch (Exception E)
                 {
-                    log_in_session_key_verification_result = log_in_session_key_invalid;
+                    log_in_session_key_verification_result = connection_failed_message;
                 }
                 finally
                 {
-                    if(verify_if_log_in_session_key_is_valid_command != null)
+                    if (verify_if_log_in_session_key_is_valid_command != null)
                     {
                         await verify_if_log_in_session_key_is_valid_command.DisposeAsync();
                     }
                 }
+            }
 
-            }
-            catch(Exception E)
+            return log_in_session_key_verification_result;
+        }
+
+
+
+        internal async Task<byte[]> Log_Out_Account(MySqlConnector.MySqlConnection connection, Client_WSDL_Payload client_WSDL_Payload)
+        {
+            byte[] log_out_account_result = connection_failed_message;
+
+            string log_in_session_key_hashing__result = await Server_Cryptographic_Functions.Content_Hasher<string>(client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key);
+
+            if(log_in_session_key_hashing__result != content_hashing_error)
             {
-                log_in_session_key_verification_result = connection_failed_message;
-            }
-            finally
-            {
-                if(verify_if_log_in_session_key_is_valid_command != null)
+                MySqlConnector.MySqlCommand log_out_account = new MySqlConnector.MySqlCommand("DELETE FROM active_log_in_sessions WHERE log_in_session_key = @log_in_session_key;", connection);
+
+                try
                 {
-                    await verify_if_log_in_session_key_is_valid_command.DisposeAsync();
+                    log_out_account.Parameters.AddWithValue("log_in_session_key", log_in_session_key_hashing__result);
+                    await log_out_account.ExecuteNonQueryAsync();
+
+                    log_out_account_result = log_out_successful;
+                }
+                catch
+                {
+
+                }
+                finally
+                {
+                    if (log_out_account != null)
+                    {
+                        await log_out_account.DisposeAsync();
+                    }
                 }
             }
 
-
-            return log_in_session_key_verification_result;
+            return log_out_account_result;
         }
     }
 }

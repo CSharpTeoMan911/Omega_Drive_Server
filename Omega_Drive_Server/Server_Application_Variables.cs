@@ -28,6 +28,7 @@ namespace Omega_Drive_Server
         protected static byte[] account_authentification_successful = Encoding.UTF8.GetBytes("Account authentification successful");
         protected static byte[] log_in_session_key_valid = Encoding.UTF8.GetBytes("Log in session key is valid");
         protected static byte[] log_in_session_key_invalid = Encoding.UTF8.GetBytes("Log in session key is invalid");
+        protected static byte[] log_out_successful = Encoding.UTF8.GetBytes("Log out successful");
         protected static string content_hashing_error = "Error occured";
         // [ END ]
 
