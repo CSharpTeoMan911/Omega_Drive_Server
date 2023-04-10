@@ -14,22 +14,24 @@ namespace Omega_Drive_Server
         //
         // [ BEGIN ]
 
-        protected static byte[] connection_failed_message = Encoding.UTF8.GetBytes("Connection failed");
-        protected static byte[] email_already_in_use_message = Encoding.UTF8.GetBytes("Email already in use");
-        protected static byte[] account_registration_successful = Encoding.UTF8.GetBytes("Registration successful");
-        protected static byte[] invalid_email_address = Encoding.UTF8.GetBytes("Invalid email address");
-        protected static byte[] invalid_password = Encoding.UTF8.GetBytes("Invalid password");
-        protected static byte[] account_not_validated = Encoding.UTF8.GetBytes("Un-validated account");
-        protected static byte[] login_successful = Encoding.UTF8.GetBytes("Log in successful");
-        protected static byte[] invalid_account_validation_code = Encoding.UTF8.GetBytes("Invalid account validation code");
-        protected static byte[] invalid_log_in_code = Encoding.UTF8.GetBytes("Invalid log in code");
-        protected static byte[] account_validation_successful = Encoding.UTF8.GetBytes("Account validation successful");
-        protected static byte[] invalid_password_length = Encoding.UTF8.GetBytes("Invalid password length");
-        protected static byte[] account_authentification_successful = Encoding.UTF8.GetBytes("Account authentification successful");
-        protected static byte[] log_in_session_key_valid = Encoding.UTF8.GetBytes("Log in session key is valid");
-        protected static byte[] log_in_session_key_invalid = Encoding.UTF8.GetBytes("Log in session key is invalid");
-        protected static byte[] log_out_successful = Encoding.UTF8.GetBytes("Log out successful");
-        protected static string content_hashing_error = "Error occured";
+        protected readonly static byte[] connection_failed_message = Encoding.UTF8.GetBytes("Connection failed");
+        protected readonly static byte[] email_already_in_use_message = Encoding.UTF8.GetBytes("Email already in use");
+        protected readonly static byte[] account_registration_successful = Encoding.UTF8.GetBytes("Registration successful");
+        protected readonly static byte[] invalid_email_address = Encoding.UTF8.GetBytes("Invalid email address");
+        protected readonly static byte[] invalid_password = Encoding.UTF8.GetBytes("Invalid password");
+        protected readonly static byte[] account_not_validated = Encoding.UTF8.GetBytes("Un-validated account");
+        protected readonly static byte[] login_successful = Encoding.UTF8.GetBytes("Log in successful");
+        protected readonly static byte[] invalid_account_validation_code = Encoding.UTF8.GetBytes("Invalid account validation code");
+        protected readonly static byte[] invalid_log_in_code = Encoding.UTF8.GetBytes("Invalid log in code");
+        protected readonly static byte[] account_validation_successful = Encoding.UTF8.GetBytes("Account validation successful");
+        protected readonly static byte[] invalid_password_length = Encoding.UTF8.GetBytes("Invalid password length");
+        protected readonly static byte[] account_authentification_successful = Encoding.UTF8.GetBytes("Account authentification successful");
+        protected readonly static byte[] log_in_session_key_valid = Encoding.UTF8.GetBytes("Log in session key is valid");
+        protected readonly static byte[] log_in_session_key_invalid = Encoding.UTF8.GetBytes("Log in session key is invalid");
+        protected readonly static byte[] log_out_successful = Encoding.UTF8.GetBytes("Log out successful");
+        protected readonly static byte[] delete_user_file_successful = Encoding.UTF8.GetBytes("User file deletion successful");
+        protected readonly static string content_hashing_error = "Error occured";
+
         // [ END ]
 
 
@@ -45,7 +47,10 @@ namespace Omega_Drive_Server
         //
         // [ BEGIN ]
 
-        private static string server_settings_file_name = "application_settings.json";
+
+
+
+        private static readonly string server_settings_file_name = "application_settings.json";
 
 
         protected static System.Net.Sockets.Socket server_socket;

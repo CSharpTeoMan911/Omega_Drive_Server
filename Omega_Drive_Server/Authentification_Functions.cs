@@ -763,8 +763,10 @@ namespace Omega_Drive_Server
 
 
 
-        internal async Task<byte[]> Verify_Log_In_Session_Key(MySqlConnector.MySqlConnection connection, Client_WSDL_Payload client_WSDL_Payload)
+        internal async Task<Tuple<byte[], string>> Verify_Log_In_Session_Key(MySqlConnector.MySqlConnection connection, Client_WSDL_Payload client_WSDL_Payload)
         {
+            string user_email = String.Empty;
+
             byte[] log_in_session_key_verification_result = connection_failed_message;
 
             string log_in_session_key_hashing__result = await Server_Cryptographic_Functions.Content_Hasher<string>(client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key);
@@ -772,7 +774,7 @@ namespace Omega_Drive_Server
 
             if(log_in_session_key_hashing__result != content_hashing_error)
             {
-                MySqlConnector.MySqlCommand verify_if_log_in_session_key_is_valid_command = new MySqlConnector.MySqlCommand("SELECT log_in_session_key FROM active_log_in_sessions WHERE log_in_session_key = @log_in_session_key;", connection);
+                MySqlConnector.MySqlCommand verify_if_log_in_session_key_is_valid_command = new MySqlConnector.MySqlCommand("SELECT user_email FROM active_log_in_sessions WHERE log_in_session_key = @log_in_session_key;", connection);
 
                 try
                 {
@@ -784,6 +786,7 @@ namespace Omega_Drive_Server
                     {
                         if (await verify_if_log_in_session_key_is_valid_command_reader.ReadAsync() == true)
                         {
+                            user_email = (string)verify_if_log_in_session_key_is_valid_command_reader["user_email"];
                             log_in_session_key_verification_result = log_in_session_key_valid;
                         }
                         else
@@ -793,13 +796,13 @@ namespace Omega_Drive_Server
                     }
                     catch (Exception E)
                     {
-                        log_in_session_key_verification_result = log_in_session_key_invalid;
+                        log_in_session_key_verification_result = connection_failed_message;
                     }
                     finally
                     {
-                        if (verify_if_log_in_session_key_is_valid_command != null)
+                        if (verify_if_log_in_session_key_is_valid_command_reader != null)
                         {
-                            await verify_if_log_in_session_key_is_valid_command.DisposeAsync();
+                            await verify_if_log_in_session_key_is_valid_command_reader.DisposeAsync();
                         }
                     }
 
@@ -817,7 +820,7 @@ namespace Omega_Drive_Server
                 }
             }
 
-            return log_in_session_key_verification_result;
+            return new Tuple<byte[], string>(log_in_session_key_verification_result, user_email);
         }
 
 

@@ -10,6 +10,21 @@ namespace Omega_Drive_Server
     {
         private Payload_Serialization Payload_Serialization = new Payload_Serialization();
         private Authentification_Functions Authentification_Functions = new Authentification_Functions();
+        private FTP_Service_Functions  FTP_Service_Functions = new FTP_Service_Functions();
+
+
+
+
+        protected const string register_function_identifier = "Register";
+        protected const string account_validation_function_identifier = "Account validation";
+        protected const string log_in_function_identifier = "Log in";
+        protected const string log_out_function_identifier = "Log out";
+        protected const string account_authentification_function_identifier = "Account authentification";
+        protected const string verify_log_in_session_key_function_identifier = "Verify log in session key";
+        protected const string retrieve_user_files_data_function_identifier = "Retrieve user files data";
+        protected const string delete_user_file_function_identifier = "Delete user file";
+
+
 
 
         internal async Task<byte[]> Server_Function_Selection(Client_WSDL_Payload payload)
@@ -26,28 +41,36 @@ namespace Omega_Drive_Server
 
                 switch(payload.Function)
                 {
-                    case "Register":
+                    case register_function_identifier:
                         function_payload = await Authentification_Functions.Register_Account(connection, payload);
                         break;
 
-                    case "Account validation":
+                    case account_validation_function_identifier:
                         function_payload = await Authentification_Functions.Validate_Account(connection, payload);
                         break;
 
-                    case "Log in":
+                    case log_in_function_identifier:
                         function_payload = await Authentification_Functions.Log_In_Account(connection, payload);
                         break;
 
-                    case "Log out":
+                    case log_out_function_identifier:
                         function_payload = await Authentification_Functions.Log_Out_Account(connection, payload);
                         break;
 
-                    case "Account authentification":
+                    case account_authentification_function_identifier:
                         function_payload = await Authentification_Functions.Authentificate_Account(connection, payload);
                         break;
 
-                    case "Verify log in session key":
-                        function_payload = await Authentification_Functions.Verify_Log_In_Session_Key(connection, payload);
+                    case verify_log_in_session_key_function_identifier:
+                        function_payload = (await Authentification_Functions.Verify_Log_In_Session_Key(connection, payload)).Item1;
+                        break;
+
+                    case retrieve_user_files_data_function_identifier:
+                        function_payload = await FTP_Service_Functions.Retrieve_User_Files_Data(connection, payload);
+                        break;
+
+                    case delete_user_file_function_identifier:
+                        function_payload = await FTP_Service_Functions.Delete_User_File(connection, payload);
                         break;
                 }
             }
