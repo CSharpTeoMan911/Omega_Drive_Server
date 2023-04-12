@@ -25,7 +25,7 @@ namespace Omega_Drive_Server
 
             if(retrieve_user_files_data_result == log_in_session_key_valid)
             {
-                MySqlConnector.MySqlCommand user_files_data_retrieval_command = new MySqlConnector.MySqlCommand("SELECT file_id, file_name, file_size, file_upload_date FROM user_files_data WHERE user_email = @user_email;", connection);
+                MySqlConnector.MySqlCommand user_files_data_retrieval_command = new MySqlConnector.MySqlCommand("SELECT file_id, file_name, file_size, file_upload_date, is_directory FROM user_files_data WHERE user_email = @user_email;", connection);
 
                 try
                 {
@@ -33,20 +33,22 @@ namespace Omega_Drive_Server
 
                     MySqlConnector.MySqlDataReader user_files_data_retrieval_command_reader = await user_files_data_retrieval_command.ExecuteReaderAsync();
 
-                    List<int> file_id_info = new List<int>();
+                    List<long> file_id_info = new List<long>();
                     List<byte[]> file_name_info = new List<byte[]>();
                     List<int> file_size_info = new List<int>();
                     List<byte[]> file_upload_date_info = new List<byte[]>();
+                    List<bool> is_directory_info = new List<bool>();
 
 
                     try
                     {
                         while(await user_files_data_retrieval_command_reader.ReadAsync() == true)
                         {
-                            file_id_info.Add((int)user_files_data_retrieval_command_reader["file_id"]);
+                            file_id_info.Add((long)user_files_data_retrieval_command_reader["file_id"]);
                             file_name_info.Add(Encoding.UTF8.GetBytes((string)user_files_data_retrieval_command_reader["file_name"]));
                             file_size_info.Add((int)user_files_data_retrieval_command_reader["file_size"]);
                             file_upload_date_info.Add(Encoding.UTF8.GetBytes(((DateTime)user_files_data_retrieval_command_reader["file_upload_date"]).ToString()));
+                            is_directory_info.Add((bool)user_files_data_retrieval_command_reader["is_directory"]);
                         }
 
                         try
@@ -57,6 +59,7 @@ namespace Omega_Drive_Server
                             user_Files_Info.FILE_NAMES = file_name_info.ToArray();
                             user_Files_Info.FILE_SIZES = file_size_info.ToArray();
                             user_Files_Info.FILE_UPLOAD_DATES = file_upload_date_info.ToArray();
+                            user_Files_Info.IS_DIRECTORY = is_directory_info.ToArray();
 
                             retrieve_user_files_data_result = Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(user_Files_Info));
                         }
@@ -114,14 +117,11 @@ namespace Omega_Drive_Server
 
                 try
                 {
-                    System.Diagnostics.Debug.WriteLine("Value: " + Encoding.UTF8.GetString(client_WSDL_Payload.Password___Or___Binary_Content));
-
                     file_deletion_command.Parameters.AddWithValue("file_id", Encoding.UTF8.GetString(client_WSDL_Payload.Password___Or___Binary_Content));
                     await file_deletion_command.ExecuteNonQueryAsync();
                 }
                 catch(Exception E)
                 {
-                    System.Diagnostics.Debug.WriteLine("Error: " + E.Message);
                     delete_user_file_result = connection_failed_message;
                 }
                 finally
@@ -134,6 +134,60 @@ namespace Omega_Drive_Server
             }
 
             return delete_user_file_result;
+        }
+
+
+
+        internal async Task<byte[]> Download_User_File(MySqlConnector.MySqlConnection connection, Client_WSDL_Payload client_WSDL_Payload)
+        {
+            byte[] download_user_file_result = connection_failed_message;
+
+            MySqlConnector.MySqlCommand download_user_file_command = new MySqlConnector.MySqlCommand("SELECT file_binaries FROM ftp_service_file_system WHERE file_id = @file_id;", connection);
+
+            try
+            {
+                download_user_file_command.Parameters.AddWithValue("file_id", Encoding.UTF8.GetString(client_WSDL_Payload.Password___Or___Binary_Content));
+
+                MySqlConnector.MySqlDataReader download_user_file_command_reader = await download_user_file_command.ExecuteReaderAsync();
+
+                try
+                {
+                    if (await download_user_file_command_reader.ReadAsync() == true)
+                    {
+                        download_user_file_result = (byte[])download_user_file_command_reader["file_binaries"];
+                    }
+                    else
+                    {
+                        download_user_file_result = connection_failed_message;
+                    }
+                }
+                catch(Exception E)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error: " + E.Message);
+                    download_user_file_result = connection_failed_message;
+                }
+                finally
+                {
+                    if (download_user_file_command_reader != null)
+                    {
+                        await download_user_file_command_reader.DisposeAsync();
+                    }
+                }
+            }
+            catch (Exception E)
+            {
+                System.Diagnostics.Debug.WriteLine("Error: " + E.Message);
+                download_user_file_result = connection_failed_message;
+            }
+            finally
+            {
+                if (download_user_file_command != null)
+                {
+                    await download_user_file_command.DisposeAsync();
+                }
+            }
+
+            return download_user_file_result;
         }
     }
 }

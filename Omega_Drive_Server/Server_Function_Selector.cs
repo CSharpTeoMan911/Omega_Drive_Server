@@ -23,6 +23,7 @@ namespace Omega_Drive_Server
         protected const string verify_log_in_session_key_function_identifier = "Verify log in session key";
         protected const string retrieve_user_files_data_function_identifier = "Retrieve user files data";
         protected const string delete_user_file_function_identifier = "Delete user file";
+        protected const string download_user_file_function_identifier = "Download user file";
 
 
 
@@ -71,6 +72,10 @@ namespace Omega_Drive_Server
 
                     case delete_user_file_function_identifier:
                         function_payload = await FTP_Service_Functions.Delete_User_File(connection, payload);
+                        break;
+
+                    case download_user_file_function_identifier:
+                        function_payload = await FTP_Service_Functions.Download_User_File(connection, payload);
                         break;
                 }
             }
