@@ -65,7 +65,7 @@ namespace Omega_Drive_Server
 
 
 
-                if (password_hashing_result != content_hashing_error && code_hashing_result != content_hashing_error)
+                if (password_hashing_result != content_hashing_error.ToString() && code_hashing_result != content_hashing_error.ToString())
                 {
                     MySqlConnector.MySqlCommand verify_if_code_exists_command = new MySqlConnector.MySqlCommand("SELECT user_email FROM accounts_pending_for_validation WHERE one_time_account_validation_code = @one_time_account_validation_code;", connection);
 
@@ -155,7 +155,7 @@ namespace Omega_Drive_Server
                 {
 
 
-                    if (password_hashing_result != content_hashing_error && code_hashing_result != content_hashing_error)
+                    if (password_hashing_result != content_hashing_error.ToString() && code_hashing_result != content_hashing_error.ToString())
                     {
 
                         MySqlConnector.MySqlCommand account_insertion_command = new MySqlConnector.MySqlCommand("INSERT INTO user_accounts VALUES(@user_email, @user_password, FALSE);", connection);
@@ -259,7 +259,7 @@ namespace Omega_Drive_Server
 
 
             
-            if(account_validation_code_hashing_result != content_hashing_error)
+            if(account_validation_code_hashing_result != content_hashing_error.ToString())
             {
                 MySqlConnector.MySqlCommand account_validation_code_verification_command = new MySqlConnector.MySqlCommand("SELECT user_email FROM accounts_pending_for_validation WHERE one_time_account_validation_code = @one_time_account_validation_code", connection);
 
@@ -404,7 +404,7 @@ namespace Omega_Drive_Server
 
             string password_hashing_result = await Server_Cryptographic_Functions.Content_Hasher<byte[]>(client_WSDL_Payload.Password___Or___Binary_Content);
 
-            if (password_hashing_result != content_hashing_error)
+            if (password_hashing_result != content_hashing_error.ToString())
             {
                 MySqlConnector.MySqlCommand verify_user_credentials_command = new MySqlConnector.MySqlCommand("SELECT user_email, user_account_validated FROM user_accounts WHERE user_password = @user_password;", connection);
 
@@ -556,7 +556,7 @@ namespace Omega_Drive_Server
                 string code_hashing_result = await Server_Cryptographic_Functions.Content_Hasher<string>(code);
 
 
-                if (code_hashing_result != content_hashing_error)
+                if (code_hashing_result != content_hashing_error.ToString())
                 {
                     if (await SMTPS_Service(client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key, code, client_WSDL_Payload.Function) == true)
                     {
@@ -609,7 +609,7 @@ namespace Omega_Drive_Server
             string authentification_code_hashing_result = await Server_Cryptographic_Functions.Content_Hasher<string>(client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key);
 
 
-            if(authentification_code_hashing_result != content_hashing_error)
+            if(authentification_code_hashing_result != content_hashing_error.ToString())
             {
                 MySqlConnector.MySqlCommand verify_log_in_code_command = new MySqlConnector.MySqlCommand("SELECT user_email FROM pending_log_in_sessions WHERE one_time_log_in_session_code = @one_time_log_in_session_code;", connection);
 
@@ -725,7 +725,7 @@ namespace Omega_Drive_Server
                 string code_hashing_result = await Server_Cryptographic_Functions.Content_Hasher<string>(code);
 
 
-                if (code_hashing_result != content_hashing_error)
+                if (code_hashing_result != content_hashing_error.ToString())
                 {
                     MySqlConnector.MySqlCommand log_in_key_insertion_command = new MySqlConnector.MySqlCommand("INSERT INTO active_log_in_sessions VALUES(@log_in_session_key, @user_email, NOW() + INTERVAL 42 HOUR);", connection);
 
@@ -772,7 +772,7 @@ namespace Omega_Drive_Server
             string log_in_session_key_hashing__result = await Server_Cryptographic_Functions.Content_Hasher<string>(client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key);
 
 
-            if(log_in_session_key_hashing__result != content_hashing_error)
+            if(log_in_session_key_hashing__result != content_hashing_error.ToString())
             {
                 MySqlConnector.MySqlCommand verify_if_log_in_session_key_is_valid_command = new MySqlConnector.MySqlCommand("SELECT user_email FROM active_log_in_sessions WHERE log_in_session_key = @log_in_session_key;", connection);
 
@@ -831,7 +831,7 @@ namespace Omega_Drive_Server
 
             string log_in_session_key_hashing__result = await Server_Cryptographic_Functions.Content_Hasher<string>(client_WSDL_Payload.Email___Or___Log_In_Session_Key___Or___Account_Validation_Key);
 
-            if(log_in_session_key_hashing__result != content_hashing_error)
+            if(log_in_session_key_hashing__result != content_hashing_error.ToString())
             {
                 MySqlConnector.MySqlCommand log_out_account = new MySqlConnector.MySqlCommand("DELETE FROM active_log_in_sessions WHERE log_in_session_key = @log_in_session_key;", connection);
 

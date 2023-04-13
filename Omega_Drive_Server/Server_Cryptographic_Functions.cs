@@ -449,7 +449,7 @@ namespace Omega_Drive_Server
             }
             else
             {
-                hashed_content = content_hashing_error;
+                hashed_content = content_hashing_error.ToString();
             }
 
 
@@ -457,7 +457,7 @@ namespace Omega_Drive_Server
 
 
 
-            if(hashed_content != content_hashing_error)
+            if(hashed_content != content_hashing_error.ToString())
             {
                 extracted_content = Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(extracted_content) + salt);
 
@@ -475,7 +475,7 @@ namespace Omega_Drive_Server
                     }
                     catch(Exception E)
                     {
-                        hashed_content = content_hashing_error;
+                        hashed_content = content_hashing_error.ToString();
 
                         if (stream != null)
                         {
@@ -493,7 +493,7 @@ namespace Omega_Drive_Server
                 }
                 catch (Exception E)
                 {
-                    hashed_content = content_hashing_error;
+                    hashed_content = content_hashing_error.ToString();
                 }
             }
 

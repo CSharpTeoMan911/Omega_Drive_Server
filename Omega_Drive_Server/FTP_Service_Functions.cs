@@ -189,5 +189,32 @@ namespace Omega_Drive_Server
 
             return download_user_file_result;
         }
+
+
+
+        internal async Task<byte[]> Upload_User_File(MySqlConnector.MySqlConnection connection, Client_WSDL_Payload client_WSDL_Payload)
+        {
+            byte[] upload_user_file_result = connection_failed_message;
+
+            MySqlConnector.MySqlCommand user_file_upload_insert_user_files_command = new MySqlConnector.MySqlCommand("INSERT INTO users_files VALUES(@file_id, @user_email);", connection);
+
+            try
+            {
+                user_file_upload_insert_user_files_command.Parameters.AddWithValue("", client_WSDL_Payload.);
+            }
+            catch
+            {
+                upload_user_file_result = connection_failed_message;
+            }
+            finally
+            {
+                if(user_file_upload_insert_user_files_command != null)
+                {
+                    await user_file_upload_insert_user_files_command.DisposeAsync();
+                }
+            }
+
+            return connection_failed_message;
+        }
     }
 }

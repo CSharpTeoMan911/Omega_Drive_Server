@@ -30,7 +30,7 @@ namespace Omega_Drive_Server
         protected readonly static byte[] log_in_session_key_invalid = Encoding.UTF8.GetBytes("Log in session key is invalid");
         protected readonly static byte[] log_out_successful = Encoding.UTF8.GetBytes("Log out successful");
         protected readonly static byte[] delete_user_file_successful = Encoding.UTF8.GetBytes("User file deletion successful");
-        protected readonly static string content_hashing_error = "Error occured";
+        protected readonly static StringBuilder content_hashing_error = new StringBuilder("Error occured");
 
         // [ END ]
 
@@ -50,7 +50,7 @@ namespace Omega_Drive_Server
 
 
 
-        private static readonly string server_settings_file_name = "application_settings.json";
+        private static readonly StringBuilder server_settings_file_name_string_builder = new StringBuilder("application_settings.json");
 
 
         protected static System.Net.Sockets.Socket server_socket;
@@ -184,7 +184,7 @@ namespace Omega_Drive_Server
 
             byte[] json_serialised_server_application_settings = Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(settings, Newtonsoft.Json.Formatting.Indented));
 
-            System.IO.FileStream server_application_settings_file_stream = System.IO.File.Create(server_settings_file_name);
+            System.IO.FileStream server_application_settings_file_stream = System.IO.File.Create(server_settings_file_name_string_builder.ToString()); ;
 
             try
             {
@@ -231,10 +231,10 @@ namespace Omega_Drive_Server
         {
             bool server_settings_load_is_successful = false;
 
-            if(System.IO.File.Exists(server_settings_file_name))
+            if(System.IO.File.Exists(server_settings_file_name_string_builder.ToString()))
             {
 
-                System.IO.StreamReader server_application_settings_stream_reader = new System.IO.StreamReader(server_settings_file_name);
+                System.IO.StreamReader server_application_settings_stream_reader = new System.IO.StreamReader(server_settings_file_name_string_builder.ToString());
 
                 try
                 {
@@ -333,11 +333,11 @@ namespace Omega_Drive_Server
         {
             bool server_settings_update_is_successful = false;
 
-            if (System.IO.File.Exists(server_settings_file_name))
+            if (System.IO.File.Exists(server_settings_file_name_string_builder.ToString()))
             {
                 try
                 {
-                    System.IO.File.Delete(server_settings_file_name);
+                    System.IO.File.Delete(server_settings_file_name_string_builder.ToString());
                     server_settings_update_is_successful = true;
                 }
                 catch
