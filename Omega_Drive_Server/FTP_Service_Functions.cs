@@ -140,50 +140,57 @@ namespace Omega_Drive_Server
 
         internal async Task<byte[]> Download_User_File(MySqlConnector.MySqlConnection connection, Client_WSDL_Payload client_WSDL_Payload)
         {
-            byte[] download_user_file_result = connection_failed_message;
+            Tuple<byte[], string> log_in_session_key_verification_result = await Authentification_Functions.Verify_Log_In_Session_Key(connection, client_WSDL_Payload);
 
-            MySqlConnector.MySqlCommand download_user_file_command = new MySqlConnector.MySqlCommand("SELECT file_binaries FROM ftp_service_file_system WHERE file_id = @file_id;", connection);
+            byte[] download_user_file_result = log_in_session_key_verification_result.Item1;
 
-            try
+
+
+            if(log_in_session_key_verification_result.Item1 == log_in_session_key_valid)
             {
-                download_user_file_command.Parameters.AddWithValue("file_id", Encoding.UTF8.GetString(client_WSDL_Payload.Password___Or___Binary_Content));
-
-                MySqlConnector.MySqlDataReader download_user_file_command_reader = await download_user_file_command.ExecuteReaderAsync();
+                MySqlConnector.MySqlCommand download_user_file_command = new MySqlConnector.MySqlCommand("SELECT file_binaries FROM ftp_service_file_system WHERE file_id = @file_id;", connection);
 
                 try
                 {
-                    if (await download_user_file_command_reader.ReadAsync() == true)
+                    download_user_file_command.Parameters.AddWithValue("file_id", Encoding.UTF8.GetString(client_WSDL_Payload.Password___Or___Binary_Content));
+
+                    MySqlConnector.MySqlDataReader download_user_file_command_reader = await download_user_file_command.ExecuteReaderAsync();
+
+                    try
                     {
-                        download_user_file_result = (byte[])download_user_file_command_reader["file_binaries"];
+                        if (await download_user_file_command_reader.ReadAsync() == true)
+                        {
+                            download_user_file_result = (byte[])download_user_file_command_reader["file_binaries"];
+                        }
+                        else
+                        {
+                            download_user_file_result = connection_failed_message;
+                        }
                     }
-                    else
+                    catch (Exception E)
                     {
+                        System.Diagnostics.Debug.WriteLine("Error: " + E.Message);
                         download_user_file_result = connection_failed_message;
                     }
+                    finally
+                    {
+                        if (download_user_file_command_reader != null)
+                        {
+                            await download_user_file_command_reader.DisposeAsync();
+                        }
+                    }
                 }
-                catch(Exception E)
+                catch (Exception E)
                 {
                     System.Diagnostics.Debug.WriteLine("Error: " + E.Message);
                     download_user_file_result = connection_failed_message;
                 }
                 finally
                 {
-                    if (download_user_file_command_reader != null)
+                    if (download_user_file_command != null)
                     {
-                        await download_user_file_command_reader.DisposeAsync();
+                        await download_user_file_command.DisposeAsync();
                     }
-                }
-            }
-            catch (Exception E)
-            {
-                System.Diagnostics.Debug.WriteLine("Error: " + E.Message);
-                download_user_file_result = connection_failed_message;
-            }
-            finally
-            {
-                if (download_user_file_command != null)
-                {
-                    await download_user_file_command.DisposeAsync();
                 }
             }
 
@@ -194,27 +201,143 @@ namespace Omega_Drive_Server
 
         internal async Task<byte[]> Upload_User_File(MySqlConnector.MySqlConnection connection, Client_WSDL_Payload client_WSDL_Payload)
         {
-            byte[] upload_user_file_result = connection_failed_message;
+            Tuple<byte[], string> log_in_session_key_verification_result = await Authentification_Functions.Verify_Log_In_Session_Key(connection, client_WSDL_Payload);
 
-            MySqlConnector.MySqlCommand user_file_upload_insert_user_files_command = new MySqlConnector.MySqlCommand("INSERT INTO users_files VALUES(@file_id, @user_email);", connection);
+            byte[] upload_user_file_result = log_in_session_key_verification_result.Item1;
 
-            try
+            long user_files_count = 0;
+
+
+            if (log_in_session_key_verification_result.Item1 == log_in_session_key_valid)
             {
-                user_file_upload_insert_user_files_command.Parameters.AddWithValue("", client_WSDL_Payload.);
-            }
-            catch
-            {
-                upload_user_file_result = connection_failed_message;
-            }
-            finally
-            {
-                if(user_file_upload_insert_user_files_command != null)
+                MySqlConnector.MySqlCommand user_files_count_command = new MySqlConnector.MySqlCommand("SELECT COUNT(*) FROM users_files AS Temporary_Derived_Table;", connection);
+
+                try
                 {
-                    await user_file_upload_insert_user_files_command.DisposeAsync();
+                    MySqlConnector.MySqlDataReader user_files_count_command_reader = await user_files_count_command.ExecuteReaderAsync();
+
+                    try
+                    {
+                        if(await user_files_count_command_reader.ReadAsync() == true)
+                        {
+                            user_files_count = (long)user_files_count_command_reader["COUNT(*)"];
+                        }
+                    }
+                    catch(Exception E)
+                    {
+                        if (user_files_count_command_reader != null)
+                        {
+                            await user_files_count_command_reader.DisposeAsync();
+                        }
+
+                        if (user_files_count_command != null)
+                        {
+                            await user_files_count_command.DisposeAsync();
+                        }
+
+                        upload_user_file_result = connection_failed_message;
+
+                        System.Diagnostics.Debug.WriteLine("Error: " + E.Message);
+
+                        goto User_File_Upload_Failed;
+                    }
+                    finally
+                    {
+                        if (user_files_count_command_reader != null)
+                        {
+                            await user_files_count_command_reader.DisposeAsync();
+                        }
+                    }
                 }
+                catch
+                {
+                    if (user_files_count_command != null)
+                    {
+                        await user_files_count_command.DisposeAsync();
+                    }
+
+                    upload_user_file_result = connection_failed_message;
+
+                    goto User_File_Upload_Failed;
+                }
+                finally
+                {
+                    if (user_files_count_command != null)
+                    {
+                        await user_files_count_command.DisposeAsync();
+                    }
+                }
+
+
+          
+
+                MySqlConnector.MySqlCommand user_file_upload_insert_user_files_command = new MySqlConnector.MySqlCommand("INSERT INTO users_files VALUES(@file_id + 1, @user_email);", connection);
+
+                try
+                {
+                    user_file_upload_insert_user_files_command.Parameters.AddWithValue("file_id", user_files_count);
+                    user_file_upload_insert_user_files_command.Parameters.AddWithValue("user_email", log_in_session_key_verification_result.Item2);
+
+                    await user_file_upload_insert_user_files_command.ExecuteNonQueryAsync();
+                }
+                catch (Exception E)
+                {
+                    upload_user_file_result = connection_failed_message;
+
+                    if (user_file_upload_insert_user_files_command != null)
+                    {
+                        await user_file_upload_insert_user_files_command.DisposeAsync();
+                    }
+
+                   
+
+                    goto User_File_Upload_Failed;
+                }
+                finally
+                {
+                    if (user_file_upload_insert_user_files_command != null)
+                    {
+                        await user_file_upload_insert_user_files_command.DisposeAsync();
+                    }
+                }
+                
+
+                
+
+
+                MySqlConnector.MySqlCommand user_file_upload_insert_ftp_service_file_system_command = new MySqlConnector.MySqlCommand("INSERT INTO ftp_service_file_system VALUES(@file_id + 1, @file_name, @file_size, NOW(), @file_binaries, FALSE);", connection);
+
+                try
+                {
+
+                    User_File user_file = Newtonsoft.Json.JsonConvert.DeserializeObject<User_File>(Encoding.UTF8.GetString(client_WSDL_Payload.Password___Or___Binary_Content));
+
+
+                    user_file_upload_insert_ftp_service_file_system_command.Parameters.AddWithValue("file_id", user_files_count);
+                    user_file_upload_insert_ftp_service_file_system_command.Parameters.AddWithValue("file_name", user_file.File_Name);
+                    user_file_upload_insert_ftp_service_file_system_command.Parameters.AddWithValue("file_size", user_file.File_Size);
+                    user_file_upload_insert_ftp_service_file_system_command.Parameters.AddWithValue("file_binaries", user_file.File_Binaries);
+
+                    await user_file_upload_insert_ftp_service_file_system_command.ExecuteNonQueryAsync();
+                }
+                catch (Exception E)
+                {
+                    System.Diagnostics.Debug.WriteLine("Error: " + E.Message);
+                    upload_user_file_result = connection_failed_message;
+                }
+                finally
+                {
+                    if (user_file_upload_insert_ftp_service_file_system_command != null)
+                    {
+                        await user_file_upload_insert_ftp_service_file_system_command.DisposeAsync();
+                    }
+                }
+                
             }
 
-            return connection_failed_message;
+
+        User_File_Upload_Failed:
+            return upload_user_file_result;
         }
     }
 }

@@ -24,6 +24,7 @@ namespace Omega_Drive_Server
         protected const string retrieve_user_files_data_function_identifier = "Retrieve user files data";
         protected const string delete_user_file_function_identifier = "Delete user file";
         protected const string download_user_file_function_identifier = "Download user file";
+        protected const string upload_user_file_function_identifier = "Upload user file";
 
 
 
@@ -76,6 +77,10 @@ namespace Omega_Drive_Server
 
                     case download_user_file_function_identifier:
                         function_payload = await FTP_Service_Functions.Download_User_File(connection, payload);
+                        break;
+
+                    case upload_user_file_function_identifier:
+                        function_payload = await FTP_Service_Functions.Upload_User_File(connection, payload);
                         break;
                 }
             }
